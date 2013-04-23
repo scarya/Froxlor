@@ -63,7 +63,8 @@ return array(
 						'value' => $subdomains.' '.$lng['customer']['subdomains'].', '.$alias_check.' '.$lng['domains']['aliasdomains'].', '.$emails.' '.$lng['customer']['emails'].', '.$email_accounts.' '.$lng['customer']['accounts'].', '.$email_forwarders.' '.$lng['customer']['forwarders']
 					),
 					'caneditdomain' => array(
-						'label' => $lng['admin']['domain_edit'],
+						'label' => $lng['admin']['domain_editable']['title'],
+						'desc' => $lng['admin']['domain_editable']['desc'],
 						'type' => 'checkbox',
 						'values' => array(
 										array ('label' => $lng['panel']['yes'], 'value' => '1')
@@ -141,7 +142,8 @@ return array(
 						'value' => array($result['wwwserveralias'])
 					),
 					'speciallogfile' => array(
-						'label' => 'Speciallogfile',
+						'label' => $lng['admin']['speciallogfile']['title'],
+						'desc' => $lng['admin']['speciallogfile']['description'],
 						'type' => 'checkbox',
 						'values' => array(
 										array ('label' => $lng['panel']['yes'], 'value' => '1')
@@ -183,14 +185,6 @@ return array(
 									),
 						'value' => array($result['openbasedir'])
 					),
-					'safemode' => array(
-						'label' => 'Safemode',
-						'type' => 'checkbox',
-						'values' => array(
-										array ('label' => $lng['panel']['yes'], 'value' => '1')
-									),
-						'value' => array($result['safemode'])
-					),
 					'phpsettingid' => array(
 						'visible' => ((int)$settings['system']['mod_fcgid'] == 1 ? true : false),
 						'label' => $lng['admin']['phpsettings']['title'],
@@ -214,7 +208,7 @@ return array(
 			'section_d' => array(
 				'title' => $lng['admin']['nameserversettings'],
 				'image' => 'icons/domain_edit.png',
-				'visible' => ($userinfo['change_serversettings'] == '1' ? true : false),
+				'visible' => ($settings['system']['bind_enable'] == '1' && $userinfo['change_serversettings'] == '1' ? true : false),
 				'fields' => array(
 					'isbinddomain' => array(
 						'label' => 'Nameserver',

@@ -1910,7 +1910,10 @@ if(isFroxlorVersion('0.9.28-svn1')) {
 if(isFroxlorVersion('0.9.28-svn2')) {
 	showUpdateStep("Updating from 0.9.28-svn2 to 0.9.28-svn3");
 	lastStepStatus(0);
-
+	
+	// change lenght of passwd column
+	$db->query("ALTER TABLE `" . TABLE_FTP_USERS . "` MODIFY `password` varchar(128) NOT NULL default ''");
+	
 	// Add default setting for vmail_maildirname if not already in place
 	$handle = $db->query("SELECT `value` FROM `panel_settings` WHERE `settinggroup` = 'system' AND `varname` = 'vmail_maildirname';");
 	if ($db->num_rows($handle) < 1) {
@@ -1919,4 +1922,183 @@ if(isFroxlorVersion('0.9.28-svn2')) {
 	}
 
 	updateToVersion('0.9.28-svn3');
+}
+
+if(isFroxlorVersion('0.9.28-svn3'))
+{
+	showUpdateStep("Updating from 0.9.28-svn3 to 0.9.28-svn4", true);
+	lastStepStatus(0);
+
+	if (isset($_POST['classic_theme_replacement']) && $_POST['classic_theme_replacement'] != '')
+	{
+		$classic_theme_replacement = $_POST['classic_theme_replacement'];
+	}
+	else
+	{
+		$classic_theme_replacement = 'Froxlor';
+	}
+	showUpdateStep('Setting replacement for the discontinued and removed Classic theme (if active)', true);
+
+	// Updating default theme setting
+	if ($settings['panel']['default_theme'] == 'Classic')
+	{
+		$db->query("UPDATE `" . TABLE_PANEL_SETTINGS . "` SET `value` = '".$db->escape($classic_theme_replacement)."' WHERE varname = 'default_theme';");
+	}
+
+	// Updating admin's theme setting
+	$db->query('UPDATE `' . TABLE_PANEL_ADMINS . '` SET `theme` = \'' . $db->escape($classic_theme_replacement) . '\' WHERE `theme` = \'Classic\'');
+
+	// Updating customer's theme setting
+	$db->query('UPDATE `' . TABLE_PANEL_CUSTOMERS . '` SET `theme` = \'' . $db->escape($classic_theme_replacement) . '\' WHERE `theme` = \'Classic\'');
+
+	// Updating theme setting of active sessions
+	$db->query('UPDATE `' . TABLE_PANEL_SESSIONS . '` SET `theme` = \'' . $db->escape($classic_theme_replacement) . '\' WHERE `theme` = \'Classic\'');
+
+	lastStepStatus(0);
+
+	showUpdateStep('Altering Froxlor database and tables to use UTF-8. This may take a while..', true);
+
+	$db->query('ALTER DATABASE `' . $db->getDbName() . '` CHARACTER SET utf8 COLLATE utf8_general_ci');
+
+	$handle = $db->query('SHOW TABLES');
+	while ($row = $db->fetch_array($handle))
+	{
+		foreach ($row as $table)
+		{
+			$db->query('ALTER TABLE `' . $table . '` CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;');
+		}
+	}
+
+	lastStepStatus(0);
+
+	updateToVersion('0.9.28-svn4');
+}
+
+if(isFroxlorVersion('0.9.28-svn4')) {
+	showUpdateStep("Updating from 0.9.28-svn4 to 0.9.28-svn5");
+
+	// Catchall functionality (enabled by default) see #1114
+	$db->query("INSERT INTO `panel_settings` (`settinggroup`, `varname`, `value`) VALUES ('catchall', 'catchall_enabled', '1');");
+
+	lastStepStatus(0);
+
+	updateToVersion('0.9.28-svn5');
+}
+
+if(isFroxlorVersion('0.9.28-svn5')) {
+	showUpdateStep("Updating from 0.9.28-svn5 to 0.9.28-svn6", true);
+	lastStepStatus(0);
+
+	$update_system_apache24 = isset($_POST['update_system_apache24']) ? (int)$_POST['update_system_apache24'] : '0';
+	showUpdateStep('Setting value for apache-2.4 modification', true);
+	// support for Apache-2.4
+	$db->query("INSERT INTO `panel_settings` (`settinggroup`, `varname`, `value`) VALUES ('system', 'apache24', '".$update_system_apache24."');");
+	lastStepStatus(0);
+
+	showUpdateStep("Inserting new tickets-see-all field to panel_admins", true);
+	$db->query("ALTER TABLE `panel_admins` ADD `tickets_see_all` tinyint(1) NOT NULL default '0' AFTER `tickets_used`");
+	lastStepStatus(0);
+
+	showUpdateStep("Updating main admin entry", true);
+	$db->query("UPDATE `panel_admins` SET `tickets_see_all` = '1' WHERE `adminid` = '".$userinfo['adminid']."';");
+	lastStepStatus(0);
+
+	showUpdateStep("Inserting new panel webfont-settings (default: off)", true);
+	$db->query("INSERT INTO `panel_settings` (`settinggroup`, `varname`, `value`) VALUES ('panel', 'use_webfonts', '0');");
+	$db->query("INSERT INTO `panel_settings` (`settinggroup`, `varname`, `value`) VALUES ('panel', 'webfont', 'Numans');");
+	lastStepStatus(0);
+
+	showUpdateStep("Inserting settings for nginx fastcgi-params file", true);
+	$fastcgiparams = '/etc/nginx/fastcgi_params';
+	if (isset($_POST['nginx_fastcgi_params']) && $_POST['nginx_fastcgi_params'] != '') {
+		$fastcgiparams = makeCorrectFile($_POST['nginx_fastcgi_params']);
+	}
+	$db->query("INSERT INTO `panel_settings` (`settinggroup`, `varname`, `value`) VALUES ('nginx', 'fastcgiparams', '".$db->escape($fastcgiparams)."')");
+	lastStepStatus(0);
+
+	updateToVersion('0.9.28-svn6');
+}
+
+if (isFroxlorVersion('0.9.28-svn6')) {
+	showUpdateStep("Updating from 0.9.28-svn6 to 0.9.28 release candidate 1");
+	lastStepStatus(0);
+	updateToVersion('0.9.28-rc1');
+}
+
+if (isFroxlorVersion('0.9.28-rc1')) {
+	showUpdateStep("Updating from 0.9.28-rc1 to 0.9.28-rc2", true);
+	lastStepStatus(0);
+
+	$update_system_documentroot_use_default_value = isset($_POST['update_system_documentroot_use_default_value']) ? (int)$_POST['update_system_documentroot_use_default_value'] : '0';
+	showUpdateStep("Adding new settings for using domain name as default value for DocumentRoot path", true);
+	$db->query("INSERT INTO `panel_settings` (`settinggroup`, `varname`, `value`) VALUES ('system', 'documentroot_use_default_value', '".$update_system_documentroot_use_default_value."');");
+	lastStepStatus(0);
+
+	updateToVersion('0.9.28-rc2');
+}
+
+if (isFroxlorVersion('0.9.28-rc2')) {
+	showUpdateStep("Updating from 0.9.28-rc2 to 0.9.28 final", true);
+	$db->query("DELETE FROM `panel_settings` WHERE `settinggroup`='system' AND `varname`='mod_log_sql'");
+	$db->query("DELETE FROM `panel_settings` WHERE `settinggroup`='system' AND `varname`='openssl_cnf'");
+	$db->query("ALTER TABLE `panel_domains` DROP `safemode`");
+	lastStepStatus(0);
+
+	updateToVersion('0.9.28');
+}
+
+if (isFroxlorVersion('0.9.28')) {
+	showUpdateStep("Updating from 0.9.28 final to 0.9.28.1");
+	lastStepStatus(0);
+	updateToVersion('0.9.28.1');
+}
+
+if (isFroxlorVersion('0.9.28.1')) {
+	showUpdateStep("Updating from 0.9.28.1 to 0.9.29-dev1", true);
+	lastStepStatus(0);
+
+	$hide_stdsubdomains = isset($_POST['hide_stdsubdomains']) ? (int)$_POST['hide_stdsubdomains'] : '0';
+	showUpdateStep('Setting value for "hide standard subdomains"', true);
+	$db->query("INSERT INTO `panel_settings` (`settinggroup`, `varname`, `value`) VALUES ('panel', 'phpconfigs_hidestdsubdomain', '".$hide_stdsubdomains."');");
+	lastStepStatus(0);
+
+	// don't advertise security questions - just set a default silently
+	$db->query("INSERT INTO `panel_settings` (`settinggroup`, `varname`, `value`) VALUES ('system', 'passwordcryptfunc', '1');");
+
+	$fastcgiparams = $settings['nginx']['fastcgiparams'];
+	// check the faulty value explicitly
+	if ($fastcgiparams == '/etc/nginx/fastcgi_params/') {
+		$fastcgiparams = makeCorrectFile(substr(fastcgiparams,0,-1));
+		$db->query("UPDATE TABLE `panel_settings` SET `value`='".$db->escape($fastcgiparams)."' WHERE `varname`='fastcgiparams';");
+	}
+	updateToVersion('0.9.29-dev1');
+}
+
+if (isFroxlorVersion('0.9.29-dev1')) {
+	showUpdateStep("Updating from 0.9.29-dev1 to 0.9.29-dev2", true);
+	lastStepStatus(0);
+
+	$allow_themechange_c = isset($_POST['allow_themechange_c']) ? (int)$_POST['allow_themechange_c'] : '1';
+	$allow_themechange_a = isset($_POST['allow_themechange_a']) ? (int)$_POST['allow_themechange_a'] : '1';
+	showUpdateStep("Inserting new setting to allow/disallow theme changes (default: on)", true);
+	$db->query("INSERT INTO `panel_settings` (`settinggroup`, `varname`, `value`) VALUES ('panel', 'allow_theme_change_admin', '".$allow_themechange_a."');");
+	$db->query("INSERT INTO `panel_settings` (`settinggroup`, `varname`, `value`) VALUES ('panel', 'allow_theme_change_customer', '".$allow_themechange_c."');");
+	lastStepStatus(0);
+
+	updateToVersion('0.9.29-dev2');
+}
+
+if (isFroxlorVersion('0.9.29-dev2')) {
+	showUpdateStep("Updating from 0.9.29-dev2 to 0.9.29-dev3", true);
+	lastStepStatus(0);
+
+	$system_afxrservers = isset($_POST['system_afxrservers']) ? $_POST['system_afxrservers'] : '';
+	if (!preg_match('/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})(, ?(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3}))*$/i', $system_afxrservers)) {
+		$system_afxrservers = '';
+	}
+	showUpdateStep("Inserting new setting for AFXR server", true);
+	$db->query("INSERT INTO `panel_settings` (`settinggroup`, `varname`, `value`) VALUES ('system', 'axfrservers', '".$db->escape($system_afxrservers)."');");
+	lastStepStatus(0);
+
+	updateToVersion('0.9.29-dev3');
 }

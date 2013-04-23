@@ -195,11 +195,9 @@ if($page == 'domains'
 				updateCounters();
 				inserttask('1');
 
-				# Using nameserver, insert a task which rebuilds the server config
-				if ($settings['system']['bind_enable'])
-				{
-					inserttask('4');
-				}
+				// Using nameserver, insert a task which rebuilds the server config
+				inserttask('4');
+
 				redirectTo($filename, Array('page' => $page, 's' => $s));
 			}
 			elseif ($alias_check['count'] > 0) {
@@ -283,9 +281,16 @@ if($page == 'domains'
 
 				if($userinfo['change_serversettings'] == '1')
 				{
-					$isbinddomain = intval($_POST['isbinddomain']);
-					$caneditdomain = isset($_POST['caneditdomain']) ? 1 : 0;
-					$zonefile = validate($_POST['zonefile'], 'zonefile');
+					$caneditdomain = isset($_POST['caneditdomain']) ? intval($_POST['caneditdomain']) : 0;
+
+					$isbinddomain = '0';
+					$zonefile = '';
+					if ($settings['system']['bind_enable'] == '1') {
+						if (isset($_POST['isbinddomain'])) {
+							$isbinddomain = intval($_POST['isbinddomain']);
+						}
+						$zonefile = validate($_POST['zonefile'], 'zonefile');
+					}
 
 					if(isset($_POST['dkim']))
 					{
@@ -299,11 +304,13 @@ if($page == 'domains'
 					$specialsettings = validate(str_replace("\r\n", "\n", $_POST['specialsettings']), 'specialsettings', '/^[^\0]*$/');
 					validate($_POST['documentroot'], 'documentroot');
 
+					// If path is empty and 'Use domain name as default value for DocumentRoot path' is enabled in settings,
+					// set default path to subdomain or domain name
 					if(isset($_POST['documentroot'])
-					   && $_POST['documentroot'] != '')
+						&& ($_POST['documentroot'] != ''))
 					{
 						if(substr($_POST['documentroot'], 0, 1) != '/'
-						   && !preg_match('/^https?\:\/\//', $_POST['documentroot']))
+							&& !preg_match('/^https?\:\/\//', $_POST['documentroot']))
 						{
 							$documentroot.= '/' . $_POST['documentroot'];
 						}
@@ -312,10 +319,19 @@ if($page == 'domains'
 							$documentroot = $_POST['documentroot'];
 						}
 					}
+					elseif (isset($_POST['documentroot'])
+						&& ($_POST['documentroot'] == '') 
+						&& ($settings['system']['documentroot_use_default_value'] == 1))
+					{
+						$documentroot = makeCorrectDir($customer['documentroot'] . '/' . $domain);
+					}
 				}
 				else
 				{
-					$isbinddomain = '1';
+					$isbinddomain = '0';
+					if ($settings['system']['bind_enable'] == '1') {
+						$isbinddomain = '1';
+					}
 					$caneditdomain = '1';
 					$zonefile = '';
 					$dkim = '1';
@@ -325,8 +341,7 @@ if($page == 'domains'
 				if($userinfo['caneditphpsettings'] == '1'
 				   || $userinfo['change_serversettings'] == '1')
 				{
-					$openbasedir = isset($_POST['openbasedir']) ? 1 : 0;
-					$safemode = isset($_POST['safemode']) ? 1 : 0;
+					$openbasedir = isset($_POST['openbasedir']) ? intval($_POST['openbasedir']) : 0;
 
 					if((int)$settings['system']['mod_fcgid'] == 1)
 					{
@@ -353,7 +368,6 @@ if($page == 'domains'
 				else
 				{
 					$openbasedir = '1';
-					$safemode = '1';
 					$phpsettingid = $settings['system']['mod_fcgid_defaultini'];
 					$mod_fcgid_starter = '-1';
 					$mod_fcgid_maxrequests = '-1';
@@ -433,11 +447,6 @@ if($page == 'domains'
 				if($openbasedir != '1')
 				{
 					$openbasedir = '0';
-				}
-
-				if($safemode != '1')
-				{
-					$safemode = '0';
 				}
 
 				if($speciallogfile != '1')
@@ -540,7 +549,6 @@ if($page == 'domains'
 						'ssl_redirect' => $ssl_redirect,
 						'ssl_ipandport' => $ssl_ipandport,
 						'openbasedir' => $openbasedir,
-						'safemode' => $safemode,
 						'phpsettingid' => $phpsettingid,
 						'mod_fcgid_starter' => $mod_fcgid_starter,
 						'mod_fcgid_maxrequests' => $mod_fcgid_maxrequests,
@@ -570,17 +578,15 @@ if($page == 'domains'
 						$question_nr++;
 					}
 
-					$db->query("INSERT INTO `" . TABLE_PANEL_DOMAINS . "` (`domain`, `customerid`, `adminid`, `documentroot`, `ipandport`,`aliasdomain`, `zonefile`, `dkim`, `wwwserveralias`, `isbinddomain`, `isemaildomain`, `email_only`, `subcanemaildomain`, `caneditdomain`, `openbasedir`, `safemode`,`speciallogfile`, `specialsettings`, `ssl`, `ssl_redirect`, `ssl_ipandport`, `add_date`, `registration_date`, `phpsettingid`, `mod_fcgid_starter`, `mod_fcgid_maxrequests`, `ismainbutsubto`) VALUES ('" . $db->escape($domain) . "', '" . (int)$customerid . "', '" . (int)$adminid . "', '" . $db->escape($documentroot) . "', '" . $db->escape($ipandport) . "', " . (($aliasdomain != 0) ? '\'' . $db->escape($aliasdomain) . '\'' : 'NULL') . ", '" . $db->escape($zonefile) . "', '" . $db->escape($dkim) . "', '" . $db->escape($wwwserveralias) . "', '" . $db->escape($isbinddomain) . "', '" . $db->escape($isemaildomain) . "', '" . $db->escape($email_only) . "', '" . $db->escape($subcanemaildomain) . "', '" . $db->escape($caneditdomain) . "', '" . $db->escape($openbasedir) . "', '" . $db->escape($safemode) . "', '" . $db->escape($speciallogfile) . "', '" . $db->escape($specialsettings) . "', '" . $ssl . "', '" . $ssl_redirect . "' , '" . $ssl_ipandport . "', '" . $db->escape(time()) . "', '" . $db->escape($registration_date) . "', '" . (int)$phpsettingid . "', '" . (int)$mod_fcgid_starter . "', '" . (int)$mod_fcgid_maxrequests . "', '".(int)$issubof."')");
+					$db->query("INSERT INTO `" . TABLE_PANEL_DOMAINS . "` (`domain`, `customerid`, `adminid`, `documentroot`, `ipandport`,`aliasdomain`, `zonefile`, `dkim`, `wwwserveralias`, `isbinddomain`, `isemaildomain`, `email_only`, `subcanemaildomain`, `caneditdomain`, `openbasedir`, `speciallogfile`, `specialsettings`, `ssl`, `ssl_redirect`, `ssl_ipandport`, `add_date`, `registration_date`, `phpsettingid`, `mod_fcgid_starter`, `mod_fcgid_maxrequests`, `ismainbutsubto`) VALUES ('" . $db->escape($domain) . "', '" . (int)$customerid . "', '" . (int)$adminid . "', '" . $db->escape($documentroot) . "', '" . $db->escape($ipandport) . "', " . (($aliasdomain != 0) ? '\'' . $db->escape($aliasdomain) . '\'' : 'NULL') . ", '" . $db->escape($zonefile) . "', '" . $db->escape($dkim) . "', '" . $db->escape($wwwserveralias) . "', '" . $db->escape($isbinddomain) . "', '" . $db->escape($isemaildomain) . "', '" . $db->escape($email_only) . "', '" . $db->escape($subcanemaildomain) . "', '" . $db->escape($caneditdomain) . "', '" . $db->escape($openbasedir) . "', '" . $db->escape($speciallogfile) . "', '" . $db->escape($specialsettings) . "', '" . $ssl . "', '" . $ssl_redirect . "' , '" . $ssl_ipandport . "', '" . $db->escape(time()) . "', '" . $db->escape($registration_date) . "', '" . (int)$phpsettingid . "', '" . (int)$mod_fcgid_starter . "', '" . (int)$mod_fcgid_maxrequests . "', '".(int)$issubof."')");
 					$domainid = $db->insert_id();
 					$db->query("UPDATE `" . TABLE_PANEL_ADMINS . "` SET `domains_used` = `domains_used` + 1 WHERE `adminid` = '" . (int)$adminid . "'");
 					$log->logAction(ADM_ACTION, LOG_INFO, "added domain '" . $domain . "'");
 					inserttask('1');
 
-					# Using nameserver, insert a task which rebuilds the server config
-					if ($settings['system']['bind_enable'])
-					{
-						inserttask('4');
-					}
+					// Using nameserver, insert a task which rebuilds the server config
+					inserttask('4');
+
 					redirectTo($filename, Array('page' => $page, 's' => $s));
 				}
 			}
@@ -683,19 +689,6 @@ if($page == 'domains'
 					$phpconfigs.= makeoption($row['description'], $row['id'], $settings['system']['mod_fcgid_defaultini'], true, true);
 				}
 
-				/*
-				$isbinddomain = makeyesno('isbinddomain', '1', '0', '1');
-				$isemaildomain = makeyesno('isemaildomain', '1', '0', '1');
-				$email_only = makeyesno('email_only', '1', '0', '0');
-				$dkim = makeyesno('dkim', '1', '0', '1');
-				$wwwserveralias = makeyesno('wwwserveralias', '1', '0', '1');
-				$caneditdomain = makeyesno('caneditdomain', '1', '0', '1');
-				$openbasedir = makeyesno('openbasedir', '1', '0', '1');
-				$safemode = makeyesno('safemode', '1', '0', '1');
-				$speciallogfile = makeyesno('speciallogfile', '1', '0', '0');
-				$ssl = makeyesno('ssl', '1', '0', '0');
-				$ssl_redirect = makeyesno('ssl_redirect', '1', '0', '0');
-				*/
 				$subcanemaildomain = makeoption($lng['admin']['subcanemaildomain']['never'], '0', '0', true, true) . makeoption($lng['admin']['subcanemaildomain']['choosableno'], '1', '0', true, true) . makeoption($lng['admin']['subcanemaildomain']['choosableyes'], '2', '0', true, true) . makeoption($lng['admin']['subcanemaildomain']['always'], '3', '0', true, true);
 				$add_date = date('Y-m-d');
 
@@ -795,7 +788,7 @@ if($page == 'domains'
 				$aliasdomain = intval($_POST['alias']);
 				$issubof = intval($_POST['issubof']);
 				$subcanemaildomain = intval($_POST['subcanemaildomain']);
-				$caneditdomain = isset($_POST['caneditdomain']) ? 1 : 0;
+				$caneditdomain = isset($_POST['caneditdomain']) ? intval($_POST['caneditdomain']) : 0;
 				$registration_date = trim($_POST['registration_date']);
 				$registration_date = validate($registration_date, 'registration_date', '/^(19|20)\d\d[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])$/', '', array('0000-00-00', '0', ''));
 
@@ -818,8 +811,14 @@ if($page == 'domains'
 
 				if($userinfo['change_serversettings'] == '1')
 				{
-					$isbinddomain = intval($_POST['isbinddomain']);
-					$zonefile = validate($_POST['zonefile'], 'zonefile');
+					$isbinddomain = $result['isbinddomain'];
+					$zonefile = $result['zonefile'];
+					if ($settings['system']['bind_enable'] == '1') {
+						if (isset($_POST['isbinddomain'])) {
+							$isbinddomain = (int)$_POST['isbinddomain'];
+						}
+						$zonefile = validate($_POST['zonefile'], 'zonefile');
+					}
 
 					if($settings['dkim']['use_dkim'] == '1')
 					{
@@ -835,7 +834,16 @@ if($page == 'domains'
 
 					if($documentroot == '')
 					{
-						$documentroot = $customer['documentroot'];
+						// If path is empty and 'Use domain name as default value for DocumentRoot path' is enabled in settings,
+						// set default path to subdomain or domain name
+						if ($settings['system']['documentroot_use_default_value'] == 1)
+						{
+							$documentroot = makeCorrectDir($customer['documentroot'] . '/' . $result['domain']);
+						}
+						else
+						{
+							$documentroot = $customer['documentroot'];
+						}
 					}
 
 					if(!preg_match('/^https?\:\/\//', $documentroot)
@@ -856,8 +864,7 @@ if($page == 'domains'
 				if($userinfo['caneditphpsettings'] == '1'
 				   || $userinfo['change_serversettings'] == '1')
 				{
-					$openbasedir = isset($_POST['openbasedir']) ? 1 : 0;
-					$safemode = isset($_POST['safemode']) ? 1 : 0;
+					$openbasedir = isset($_POST['openbasedir']) ? intval($_POST['openbasedir']) : 0;
 
 					if((int)$settings['system']['mod_fcgid'] == 1)
 					{
@@ -884,7 +891,6 @@ if($page == 'domains'
 				else
 				{
 					$openbasedir = $result['openbasedir'];
-					$safemode = $result['safemode'];
 					$phpsettingid = $result['phpsettingid'];
 					$mod_fcgid_starter = $result['mod_fcgid_starter'];
 					$mod_fcgid_maxrequests = $result['mod_fcgid_maxrequests'];
@@ -946,11 +952,6 @@ if($page == 'domains'
 				if($openbasedir != '1')
 				{
 					$openbasedir = '0';
-				}
-
-				if($safemode != '1')
-				{
-					$safemode = '0';
 				}
 
 				if($isbinddomain != '1')
@@ -1030,7 +1031,6 @@ if($page == 'domains'
 					'ssl_redirect' => $ssl_redirect,
 					'ssl_ipandport' => $ssl_ipandport,
 					'openbasedir' => $openbasedir,
-					'safemode' => $safemode,
 					'phpsettingid' => $phpsettingid,
 					'mod_fcgid_starter' => $mod_fcgid_starter,
 					'mod_fcgid_maxrequests' => $mod_fcgid_maxrequests,
@@ -1066,7 +1066,6 @@ if($page == 'domains'
 				   || $ssl_ipandport != $result['ssl_ipandport']
 				   || $wwwserveralias != $result['wwwserveralias']
 				   || $openbasedir != $result['openbasedir']
-				   || $safemode != $result['safemode']
 				   || $phpsettingid != $result['phpsettingid']
 				   || $mod_fcgid_starter != $result['mod_fcgid_starter']
 				   || $mod_fcgid_maxrequests != $result['mod_fcgid_maxrequests']
@@ -1138,8 +1137,8 @@ if($page == 'domains'
 					$log->logAction(ADM_ACTION, LOG_INFO, "removed specialsettings on all subdomains of domain #" . $id);
 				}
 
-				$result = $db->query("UPDATE `" . TABLE_PANEL_DOMAINS . "` SET `customerid` = '" . (int)$customerid . "', `adminid` = '" . (int)$adminid . "', `documentroot`='" . $db->escape($documentroot) . "', `ipandport`='" . $db->escape($ipandport) . "', `ssl`='" . (int)$ssl . "', `ssl_redirect`='" . (int)$ssl_redirect . "', `ssl_ipandport`='" . (int)$ssl_ipandport . "', `aliasdomain`=" . (($aliasdomain != 0 && $alias_check == 0) ? '\'' . $db->escape($aliasdomain) . '\'' : 'NULL') . ", `isbinddomain`='" . $db->escape($isbinddomain) . "', `isemaildomain`='" . $db->escape($isemaildomain) . "', `email_only`='" . $db->escape($email_only) . "', `subcanemaildomain`='" . $db->escape($subcanemaildomain) . "', `dkim`='" . $db->escape($dkim) . "', `caneditdomain`='" . $db->escape($caneditdomain) . "', `zonefile`='" . $db->escape($zonefile) . "', `wwwserveralias`='" . $db->escape($wwwserveralias) . "', `openbasedir`='" . $db->escape($openbasedir) . "', `safemode`='" . $db->escape($safemode) . "', `speciallogfile`='" . $db->escape($speciallogfile) . "', `phpsettingid`='" . $db->escape($phpsettingid) . "', `mod_fcgid_starter`='" . $db->escape($mod_fcgid_starter) . "', `mod_fcgid_maxrequests`='" . $db->escape($mod_fcgid_maxrequests) . "', `specialsettings`='" . $db->escape($specialsettings) . "', `registration_date`='" . $db->escape($registration_date) . "', `ismainbutsubto`='" . (int)$issubof . "' WHERE `id`='" . (int)$id . "'");
-				$result = $db->query("UPDATE `" . TABLE_PANEL_DOMAINS . "` SET `customerid` = '" . (int)$customerid . "', `adminid` = '" . (int)$adminid . "', `ipandport`='" . $db->escape($ipandport) . "', `openbasedir`='" . $db->escape($openbasedir) . "', `safemode`='" . $db->escape($safemode) . "', `phpsettingid`='" . $db->escape($phpsettingid) . "', `mod_fcgid_starter`='" . $db->escape($mod_fcgid_starter) . "', `mod_fcgid_maxrequests`='" . $db->escape($mod_fcgid_maxrequests) . "'" . $upd_specialsettings . $updatechildren . " WHERE `parentdomainid`='" . (int)$id . "'");
+				$result = $db->query("UPDATE `" . TABLE_PANEL_DOMAINS . "` SET `customerid` = '" . (int)$customerid . "', `adminid` = '" . (int)$adminid . "', `documentroot`='" . $db->escape($documentroot) . "', `ipandport`='" . $db->escape($ipandport) . "', `ssl`='" . (int)$ssl . "', `ssl_redirect`='" . (int)$ssl_redirect . "', `ssl_ipandport`='" . (int)$ssl_ipandport . "', `aliasdomain`=" . (($aliasdomain != 0 && $alias_check == 0) ? '\'' . $db->escape($aliasdomain) . '\'' : 'NULL') . ", `isbinddomain`='" . $db->escape($isbinddomain) . "', `isemaildomain`='" . $db->escape($isemaildomain) . "', `email_only`='" . $db->escape($email_only) . "', `subcanemaildomain`='" . $db->escape($subcanemaildomain) . "', `dkim`='" . $db->escape($dkim) . "', `caneditdomain`='" . $db->escape($caneditdomain) . "', `zonefile`='" . $db->escape($zonefile) . "', `wwwserveralias`='" . $db->escape($wwwserveralias) . "', `openbasedir`='" . $db->escape($openbasedir) . "', `speciallogfile`='" . $db->escape($speciallogfile) . "', `phpsettingid`='" . $db->escape($phpsettingid) . "', `mod_fcgid_starter`='" . $db->escape($mod_fcgid_starter) . "', `mod_fcgid_maxrequests`='" . $db->escape($mod_fcgid_maxrequests) . "', `specialsettings`='" . $db->escape($specialsettings) . "', `registration_date`='" . $db->escape($registration_date) . "', `ismainbutsubto`='" . (int)$issubof . "' WHERE `id`='" . (int)$id . "'");
+				$result = $db->query("UPDATE `" . TABLE_PANEL_DOMAINS . "` SET `customerid` = '" . (int)$customerid . "', `adminid` = '" . (int)$adminid . "', `ipandport`='" . $db->escape($ipandport) . "', `openbasedir`='" . $db->escape($openbasedir) . "', `phpsettingid`='" . $db->escape($phpsettingid) . "', `mod_fcgid_starter`='" . $db->escape($mod_fcgid_starter) . "', `mod_fcgid_maxrequests`='" . $db->escape($mod_fcgid_maxrequests) . "'" . $upd_specialsettings . $updatechildren . " WHERE `parentdomainid`='" . (int)$id . "'");
 				$log->logAction(ADM_ACTION, LOG_INFO, "edited domain #" . $id);
 				$redirect_props = Array(
 					'page' => $page,
@@ -1239,18 +1238,7 @@ if($page == 'domains'
 				}
 
 				$result['specialsettings'] = $result['specialsettings'];
-				/*
-				$isbinddomain = makeyesno('isbinddomain', '1', '0', $result['isbinddomain']);
-				$wwwserveralias = makeyesno('wwwserveralias', '1', '0', $result['wwwserveralias']);
-				$isemaildomain = makeyesno('isemaildomain', '1', '0', $result['isemaildomain']);
-				$email_only = makeyesno('email_only', '1', '0', $result['email_only']);
-				$ssl = makeyesno('ssl', '1', '0', $result['ssl']);
-				$ssl_redirect = makeyesno('ssl_redirect', '1', '0', $result['ssl_redirect']);
-				$dkim = makeyesno('dkim', '1', '0', $result['dkim']);
-				$caneditdomain = makeyesno('caneditdomain', '1', '0', $result['caneditdomain']);
-				$openbasedir = makeyesno('openbasedir', '1', '0', $result['openbasedir']);
-				$safemode = makeyesno('safemode', '1', '0', $result['safemode']);
-				*/
+
 				$subcanemaildomain = makeoption($lng['admin']['subcanemaildomain']['never'], '0', $result['subcanemaildomain'], true, true);
 				$subcanemaildomain.= makeoption($lng['admin']['subcanemaildomain']['choosableno'], '1', $result['subcanemaildomain'], true, true);
 				$subcanemaildomain.= makeoption($lng['admin']['subcanemaildomain']['choosableyes'], '2', $result['subcanemaildomain'], true, true);
@@ -1266,10 +1254,6 @@ if($page == 'domains'
 					$phpconfigs.= makeoption($phpconfigs_row['description'], $phpconfigs_row['id'], $result['phpsettingid'], true, true);
 				}
 
-				/*
-				$specialsettingsforsubdomains = makeyesno('specialsettingsforsubdomains', '1', '0', '1');
-				*/
-
 				$result = htmlentities_array($result);
 
 				$domain_edit_data = include_once dirname(__FILE__).'/lib/formfields/admin/domains/formfield.domains_edit.php';
@@ -1277,6 +1261,8 @@ if($page == 'domains'
 
 				$title = $domain_edit_data['domain_edit']['title'];
 				$image = $domain_edit_data['domain_edit']['image'];
+
+				$speciallogwarning = sprintf($lng['admin']['speciallogwarning'], $lng['admin']['delete_statistics']);
 
 				eval("echo \"" . getTemplate("domains/domains_edit") . "\";");
 			}

@@ -17,6 +17,23 @@
  * 
  */
 
+// Try to guess user/group from settings' email UID/GID
+$vmail_user=posix_getpwuid($settings['system']['vmail_uid']);
+$vmail_group=posix_getgrgid($settings['system']['vmail_gid']);
+
+/* If one of them are not set, call it 'vmail' and suggest creating user/group
+ * in scripts. */
+if ($vmail_user === false) {
+	$vmail_username="vmail";
+} else {
+	$vmail_username=$vmail_user['name'];
+}
+if ($vmail_group === false) {
+	$vmail_groupname="vmail";
+} else {
+	$vmail_groupname=$vmail_group['name'];
+}
+
 return Array(
 	'opensuse_11_x' => Array(
 		'label' => 'openSUSE 11.x',
@@ -68,11 +85,11 @@ return Array(
 							'etc_sasl2_smtpd.conf' => '/etc/sasl2/smtpd.conf'
 						),
 						'commands' => Array(
-							'mkdir -p /var/spool/postfix/etc/pam.d',
-							'groupadd -g ' . $settings['system']['vmail_gid'] . ' vmail',
-							'useradd -u ' . $settings['system']['vmail_uid'] . ' -g vmail vmail',
+							($vmail_group === false) ? 'groupadd -g ' . $settings['system']['vmail_gid'] . ' ' . $vmail_groupname : '',
+							($vmail_user === false) ? 'useradd -u ' . $settings['system']['vmail_uid'] . ' -g ' . $vmail_groupname . ' ' . $vmail_username : '',
 							'mkdir -p ' . $settings['system']['vmail_homedir'],
-							'chown -R vmail:vmail ' . $settings['system']['vmail_homedir'],
+							'chown -R ' . $vmail_username . ':' . $vmail_groupname . ' ' . $settings['system']['vmail_homedir'],
+							'mkdir -p /var/spool/postfix/etc/pam.d',
 							'touch /etc/postfix/mysql-virtual_alias_maps.cf',
 							'touch /etc/postfix/mysql-virtual_mailbox_domains.cf',
 							'touch /etc/postfix/mysql-virtual_mailbox_maps.cf',
@@ -106,13 +123,13 @@ return Array(
 					'postfix_dovecot' => Array(
                                                 'label' => 'Postfix/Dovecot',
                                                 'commands' => Array(
+                                                        ($vmail_group === false) ? 'groupadd -g ' . $settings['system']['vmail_gid'] . ' ' . $vmail_groupname : '',
+                                                        ($vmail_user === false) ? 'useradd -u ' . $settings['system']['vmail_uid'] . ' -g ' . $vmail_groupname . ' ' . $vmail_username : '',
                                                         'zypper install postfix postfix-mysql',
                                                         'mkdir -p /var/spool/postfix/etc/pam.d',
                                                         'mkdir -p /var/spool/postfix/var/run/mysqld',
-                                                        'groupadd -g ' . $settings['system']['vmail_gid'] . ' vmail',
-                                                        'useradd -u ' . $settings['system']['vmail_uid'] . ' -g vmail vmail',
                                                         'mkdir -p ' . $settings['system']['vmail_homedir'],
-                                                        'chown -R vmail:vmail ' . $settings['system']['vmail_homedir'],
+                                                        'chown -R '.$vmail_username.':'.$vmail_groupname.' ' . $settings['system']['vmail_homedir'],
                                                         'touch /etc/postfix/mysql-virtual_alias_maps.cf',
                                                         'touch /etc/postfix/mysql-virtual_mailbox_domains.cf',
                                                         'touch /etc/postfix/mysql-virtual_mailbox_maps.cf',
@@ -238,14 +255,8 @@ return Array(
 						'label' => 'Awstats',
 						'commands' => Array(
 							'cp /usr/share/doc/packages/awstats/awstats.model.conf /etc/awstats/',
-							/**makeCorrectFile($settings['system']['awstats_conf'].'/awstats.conf').' '.makeCorrectFile($settings['system']['awstats_conf'].'/awstats.model.conf'),*/
 							'sed -i.bak \'s/^DirData/# DirData/\''.makeCorrectFile($settings['system']['awstats_conf'].'/awstats.model.conf'),
-			                                'cp awstats.model.conf awstats.yourdomain.xx.conf #e.g one.example.com or example.com',
-                                                        'edit awstats.yourdomain.xx.conf',
-                                                        'change SiteDomain="yourdomain.xx #e.g SiteDomain="example.com" ',
-                                                        'change HostAliases="yourdomain.xx www.yourdomain.de 127.0.0.1 localhost" ',
-                                                        'Set DirIcons="/awstatsicons" ',
-                                                        'run awstats in your favorite browser by http://yourdomain.xx/cgi-bin/awstats.pl'
+							'# Please make sure you deactivate awstats own cronjob as Froxlor handles that itself'
 						)
 					)
 				)

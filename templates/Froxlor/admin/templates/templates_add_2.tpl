@@ -2,7 +2,7 @@ $header
 	<article>
 		<header>
 			<h2>
-				<img src="images/Froxlor/{$image}" alt="{$title}" />&nbsp;
+				<img src="templates/{$theme}/assets/img/{$image}" alt="{$title}" />&nbsp;
 				{$title}
 			</h2>
 		</header>
@@ -33,7 +33,7 @@ $header
 	<article>
 		<header>
 			<h2>
-				<img src="images/Froxlor/icons/replace_vars.png" alt="" />&nbsp;
+				<img src="templates/{$theme}/assets/img/icons/replace_vars.png" alt="" />&nbsp;
 				{$lng['admin']['templates']['template_replace_vars']}
 			</h2>
 		</header>
@@ -54,27 +54,27 @@ $header
 					</td>
 				</tr>
 				<tr>
-					<td><i>{SALUTATION}</em>:</td>
+					<td><i>{SALUTATION}</em></td>
 					<td>{$lng['admin']['templates']['SALUTATION']}</td>
 				</tr>
 				<tr>
-					<td><i>{FIRSTNAME}</em>:</td>
+					<td><i>{FIRSTNAME}</em></td>
 					<td>{$lng['admin']['templates']['FIRSTNAME']}</td>
 				</tr>
 				<tr>
-					<td><em>{NAME}</em>:</td>
+					<td><em>{NAME}</em></td>
 					<td>{$lng['admin']['templates']['NAME']}</td>
 				</tr>
 				<tr>
-					<td><em>{COMPANY}</em>:</td>
+					<td><em>{COMPANY}</em></td>
 					<td>{$lng['admin']['templates']['COMPANY']}</td>
 				</tr>
 				<tr>
-					<td><em>{USERNAME}</em>:</td>
+					<td><em>{USERNAME}</em></td>
 					<td>{$lng['admin']['templates']['USERNAME']}</td>
 				</tr>
 				<tr>
-					<td><em>{PASSWORD}</em>:</td>
+					<td><em>{PASSWORD}</em></td>
 					<td>{$lng['admin']['templates']['PASSWORD']}</td>
 				</tr>
 				<tr>
@@ -83,7 +83,7 @@ $header
 					</td>
 				</tr>
 				<tr>
-					<td><em>{EMAIL}</em>:</td>
+					<td><em>{EMAIL}</em></td>
 					<td>{$lng['admin']['templates']['EMAIL']}</td>
 				</tr>
 				<if $settings['panel']['sendalternativemail'] == 1>
@@ -93,11 +93,11 @@ $header
 					</td>
 				</tr>
 				<tr>
-					<td><em>{EMAIL}</em>:</td>
+					<td><em>{EMAIL}</em></td>
 					<td>{$lng['admin']['templates']['EMAIL']}</td>
 				</tr>
 				<tr>
-					<td><em>{PASSWORD}</em>:</td>
+					<td><em>{PASSWORD}</em></td>
 					<td>{$lng['admin']['templates']['EMAIL_PASSWORD']}</td>
 				</tr>
 				</if>
@@ -107,15 +107,15 @@ $header
 					</td>
 				</tr>
 				<tr>
-					<td><em>{SALUTATION}</em>:</td>
+					<td><em>{SALUTATION}</em></td>
 					<td>{$lng['admin']['templates']['SALUTATION']}</td>
 				</tr>
 				<tr>
-					<td><em>{USERNAME}</em>:</td>
+					<td><em>{USERNAME}</em></td>
 					<td>{$lng['admin']['templates']['USERNAME']}</td>
 				</tr>
 				<tr>
-					<td><em>{PASSWORD}</em>:</td>
+					<td><em>{PASSWORD}</em></td>
 					<td>{$lng['admin']['templates']['PASSWORD']}</td>
 				</tr>
 				<tr>
@@ -124,19 +124,23 @@ $header
 					</td>
 				</tr>
 				<tr>
-					<td><em>{TRAFFIC}</em>:</td>
+					<td><em>{SALUTATION}</em></td>
+					<td>{$lng['admin']['templates']['SALUTATION']}</td>
+				</tr>
+				<tr>
+					<td><em>{TRAFFIC}</em></td>
 					<td>{$lng['admin']['templates']['TRAFFIC']}</td>
 				</tr>
 				<tr>
-					<td><em>{TRAFFICUSED}</em>:</td>
+					<td><em>{TRAFFICUSED}</em></td>
 					<td>{$lng['admin']['templates']['TRAFFICUSED']}</td>
 				</tr>
 				<tr>
-					<td><em>{MAX_PERCENT}</em>:</td>
+					<td><em>{MAX_PERCENT}</em></td>
 					<td>{$lng['admin']['templates']['MAX_PERCENT']}</td>
 				</tr>
 				<tr>
-					<td><em>{USAGE_PERCENT}</em>:</td>
+					<td><em>{USAGE_PERCENT}</em></td>
 					<td>{$lng['admin']['templates']['USAGE_PERCENT']}</td>
 				</tr>
 				<tr>
@@ -145,19 +149,23 @@ $header
 					</td>
 				</tr>
 				<tr>
-					<td><em>{DISKAVAILABLE}</em>:</td>
+					<td><em>{SALUTATION}</em></td>
+					<td>{$lng['admin']['templates']['SALUTATION']}</td>
+				</tr>
+				<tr>
+					<td><em>{DISKAVAILABLE}</em></td>
 					<td>{$lng['admin']['templates']['DISKAVAILABLE']}</td>
 				</tr>
 				<tr>
-					<td><em>{DISKUSED}</em>:</td>
+					<td><em>{DISKUSED}</em></td>
 					<td>{$lng['admin']['templates']['DISKUSED']}</td>
 				</tr>
 				<tr>
-					<td><em>{MAX_PERCENT}</em>:</td>
+					<td><em>{MAX_PERCENT}</em></td>
 					<td>{$lng['admin']['templates']['MAX_PERCENT']}</td>
 				</tr>
 				<tr>
-					<td><em>{USAGE_PERCENT}</em>:</td>
+					<td><em>{USAGE_PERCENT}</em></td>
 					<td>{$lng['admin']['templates']['USAGE_PERCENT']}</td>
 				</tr>
 				<tr>
@@ -166,23 +174,23 @@ $header
 					</td>
 				</tr>
 				<tr>
-					<td><em>{SUBJECT}</em>:</td>
+					<td><em>{SUBJECT}</em></td>
 					<td>{$lng['admin']['templates']['SUBJECT']}</td>
 				</tr>
 				<tr>
-					<td><em>{SALUTATION}</em>:</td>
+					<td><em>{SALUTATION}</em></td>
 					<td>{$lng['admin']['templates']['SALUTATION']}</td>
 				</tr>
 				<tr>
-					<td><em>{FIRSTNAME}</em>:</td>
+					<td><em>{FIRSTNAME}</em></td>
 					<td>{$lng['admin']['templates']['FIRSTNAME']}</td>
 				</tr>
 				<tr>
-					<td><em>{NAME}</em>:</td>
+					<td><em>{NAME}</em></td>
 					<td>{$lng['admin']['templates']['NAME']}</td>
 				</tr>
 				<tr>
-					<td><em>{COMPANY}</em>:</td>
+					<td><em>{COMPANY}</em></td>
 					<td>{$lng['admin']['templates']['COMPANY']}</td>
 				</tr>
 				<tr>
@@ -191,27 +199,27 @@ $header
 					</td>
 				</tr>
 				<tr>
-					<td><em>{CUST_NAME}</em>:</td>
-					<td>{$lng['admin']['templates']['CUST_NAME']}</td>
+					<td><em>{SALUTATION}</em></td>
+					<td>{$lng['admin']['templates']['SALUTATION']}</td>
 				</tr>
 				<tr>
-					<td><em>{DB_NAME}</em>:</td>
+					<td><em>{DB_NAME}</em></td>
 					<td>{$lng['admin']['templates']['DB_NAME']}</td>
 				</tr>
 				<tr>
-					<td><em>{DB_PASS}</em>:</td>
+					<td><em>{DB_PASS}</em></td>
 					<td>{$lng['admin']['templates']['DB_PASS']}</td>
 				</tr>
 				<tr>
-					<td><em>{DB_DESC}</em>:</td>
+					<td><em>{DB_DESC}</em></td>
 					<td>{$lng['admin']['templates']['DB_DESC']}</td>
 				</tr>
 				<tr>
-					<td><em>{DB_SRV}</em>:</td>
+					<td><em>{DB_SRV}</em></td>
 					<td>{$lng['admin']['templates']['DB_SRV']}</td>
 				</tr>
 				<tr>
-					<td><em>{PMA_URI}</em>:</td>
+					<td><em>{PMA_URI}</em></td>
 					<td>{$lng['admin']['templates']['PMA_URI']}</td>
 				</tr>
 				<tr>
@@ -220,19 +228,19 @@ $header
 					</td>
 				</tr>
 				<tr>
-					<td><em>{CUST_NAME}</em>:</td>
-					<td>{$lng['admin']['templates']['CUST_NAME']}</td>
+					<td><em>{SALUTATION}</em></td>
+					<td>{$lng['admin']['templates']['SALUTATION']}</td>
 				</tr>
 				<tr>
-					<td><em>{USR_NAME}</em>:</td>
+					<td><em>{USR_NAME}</em></td>
 					<td>{$lng['admin']['templates']['USR_NAME']}</td>
 				</tr>
 				<tr>
-					<td><em>{USR_PASS}</em>:</td>
+					<td><em>{USR_PASS}</em></td>
 					<td>{$lng['admin']['templates']['USR_PASS']}</td>
 				</tr>
 				<tr>
-					<td><em>{USR_PATH}</em>:</td>
+					<td><em>{USR_PATH}</em></td>
 					<td>{$lng['admin']['templates']['USR_PATH']}</td>
 				</tr>
 			</tbody>
@@ -242,4 +250,3 @@ $header
 
 	</article>
 $footer
-

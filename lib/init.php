@@ -17,7 +17,7 @@
  *
  */
 
-header("Content-Type: text/html; charset=iso-8859-1");
+header("Content-Type: text/html; charset=UTF-8");
 
 // prevent Froxlor pages from being cached
 header("Cache-Control: no-store, no-cache, must-revalidate");
@@ -67,27 +67,27 @@ unset($value);
 unset($key);
 $filename = basename($_SERVER['PHP_SELF']);
 
-if(!file_exists('./lib/userdata.inc.php'))
+if(!file_exists('lib/userdata.inc.php'))
 {
-	$config_hint = file_get_contents('./templates/Froxlor/misc/configurehint.tpl');
+	$config_hint = file_get_contents('templates/Froxlor/misc/configurehint.tpl');
 	die($config_hint);
 }
 
-if(!is_readable('./lib/userdata.inc.php'))
+if(!is_readable('lib/userdata.inc.php'))
 {
-	die('You have to make the file "./lib/userdata.inc.php" readable for the http-process!');
+	die('You have to make the file "lib/userdata.inc.php" readable for the http-process!');
 }
 
 /**
  * Includes the Usersettings eg. MySQL-Username/Passwort etc.
  */
 
-require ('./lib/userdata.inc.php');
+require ('lib/userdata.inc.php');
 
 if(!isset($sql)
    || !is_array($sql))
 {
-	$config_hint = file_get_contents('./templates/Froxlor/misc/configurehint.tpl');
+	$config_hint = file_get_contents('templates/Froxlor/misc/configurehint.tpl');
 	die($config_hint);
 }
 
@@ -103,13 +103,13 @@ if(isset($sql['root_user']) && isset($sql['root_password']) && (!isset($sql_root
  * Includes the Functions
  */
 
-require ('./lib/functions.php');
+require ('lib/functions.php');
 
 /**
  * Includes the MySQL-Tabledefinitions etc.
  */
 
-require ('./lib/tables.inc.php');
+require ('lib/tables.inc.php');
 
 /**
  * Includes the MySQL-Connection-Class
@@ -177,7 +177,7 @@ if(get_magic_quotes_gpc())
  * Selects settings from MySQL-Table
  */
 
-$settings_data = loadConfigArrayDir('./actions/admin/settings/');
+$settings_data = loadConfigArrayDir('actions/admin/settings/');
 $settings = loadSettings($settings_data, $db);
 
 /**
@@ -276,7 +276,13 @@ $result = $db->query($query);
 while($row = $db->fetch_array($result))
 {
 	$langs[$row['language']][] = $row;
-	$iso[$row['iso']] = $row['language'];
+	// check for row[iso] cause older froxlor
+	// versions didn't have that and it will
+	// lead to a lot of undfined variables
+	// before the admin can even update
+	if (isset($row['iso'])) { 
+		$iso[$row['iso']] = $row['language'];
+	}
 }
 
 // buildup $languages for the login screen
@@ -285,43 +291,42 @@ foreach($langs as $key => $value)
 	$languages[$key] = $key;
 }
 
-if (isset($userinfo['language']) && isset($languages[$userinfo['language']]))
-{
+// set default langauge before anything else to
+// ensure that we can display messages
+$language = $settings['panel']['standardlanguage'];
+
+if (isset($userinfo['language']) && isset($languages[$userinfo['language']])) {
 	// default: use language from session, #277
 	$language = $userinfo['language'];
-}
-else
-{
-	if(!isset($userinfo['def_language'])
-	   || !isset($languages[$userinfo['def_language']]))// this will always evaluat  true, since it is the above statement inverted. @todo remove
-	{
-		if(isset($_GET['language'])
-		   && isset($languages[$_GET['language']]))
-		{
+} else {
+	if (!isset($userinfo['def_language'])
+	   || !isset($languages[$userinfo['def_language']]) // this will always evaluat  true, since it is the above statement inverted. @todo remove
+	) {
+		if (isset($_GET['language'])
+		   && isset($languages[$_GET['language']])
+		) {
 			$language = $_GET['language'];
-		}
-		else
-		{
-			$accept_langs = explode(',',$_SERVER['HTTP_ACCEPT_LANGUAGE']);
-			for($i = 0; $i<count($accept_langs); $i++) {
-			    # this only works for most common languages. some (uncommon) languages have a 3 letter iso-code.
-			    # to be able to use these also, we would have to depend on the intl extension for php (using Locale::lookup or similar)
-			    # as long as froxlor does not support any of these languages, we can leave it like that.
-				if(isset($iso[substr($accept_langs[$i],0,2)])) {
-					$language=$iso[substr($accept_langs[$i],0,2)];
-					break;
+		} else {
+			if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+				$accept_langs = explode(',',$_SERVER['HTTP_ACCEPT_LANGUAGE']);
+				for($i = 0; $i<count($accept_langs); $i++) {
+				    // this only works for most common languages. some (uncommon) languages have a 3 letter iso-code.
+				    // to be able to use these also, we would have to depend on the intl extension for php (using Locale::lookup or similar)
+				    // as long as froxlor does not support any of these languages, we can leave it like that.
+					if (isset($iso[substr($accept_langs[$i],0,2)])) {
+						$language=$iso[substr($accept_langs[$i],0,2)];
+						break;
+					}
+				}
+				unset($iso);
+
+				// if HTTP_ACCEPT_LANGUAGES has no valid langs, use default (very unlikely)
+				if (!strlen($language)>0) {
+					$language = $settings['panel']['standardlanguage'];
 				}
 			}
-			unset($iso);
-			
-			// if HTTP_ACCEPT_LANGUAGES has no valid langs, use default (very unlikely)
-			if(!strlen($language)>0) {
-				$language = $settings['panel']['standardlanguage'];
-			}
 		}
-	}
-	else
-	{
+	} else {
 		$language = $userinfo['def_language'];
 	}
 }
@@ -343,6 +348,9 @@ if($language != 'English')
 	}
 }
 
+// last but not least include language error_references file
+include_once makeSecurePath('lng/error_references.php');
+
 // Initialize our new link - class
 
 $linker = new linker('index.php', $s);
@@ -355,16 +363,22 @@ $theme = isset($settings['panel']['default_theme']) ? $settings['panel']['defaul
 /**
  * overwrite with customer/admin theme if defined
  */
-if(isset($userinfo['theme']) && $userinfo['theme'] != $theme)
-{
+if (isset($userinfo['theme']) && $userinfo['theme'] != $theme) {
 	$theme = $userinfo['theme'];
+}
+
+// check for existence of the theme
+if (!file_exists('templates/'.$theme.'/index.tpl')) {
+	// Fallback
+	$theme = 'Froxlor';
 }
 
 /*
  * check for custom header-graphic
  */
-$hl_path = 'images/'.$theme;
+$hl_path = 'templates/'.$theme.'/assets/img';
 $header_logo = $hl_path.'/logo.png';
+
 if(file_exists($hl_path.'/logo_custom.png')) {
 	$header_logo = $hl_path.'/logo_custom.png';
 }
@@ -448,12 +462,13 @@ if(AREA == 'admin' || AREA == 'customer')
 	}
 	else
 	{
-		$navigation_data = loadConfigArrayDir('./lib/navigation/');
+		$navigation_data = loadConfigArrayDir('lib/navigation/');
 		$navigation = buildNavigation($navigation_data[AREA], $userinfo);
 	}
 	unset($navigation_data);
 }
 
+$webfont = str_replace('+', ' ', $settings['panel']['webfont']);
 eval("\$header = \"" . getTemplate('header', '1') . "\";");
 
 $current_year = date('Y', time());
@@ -499,6 +514,8 @@ if($page == '')
  * Initialize the mailingsystem
  */
 $mail = new PHPMailer(true);
+$mail->CharSet = "UTF-8";
+
 if(PHPMailer::ValidateAddress($settings['panel']['adminmail']) !== false)
 {
 	// set return-to address and custom sender-name, see #76

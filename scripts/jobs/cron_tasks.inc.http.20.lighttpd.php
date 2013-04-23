@@ -164,7 +164,6 @@ class lighttpd
 						'mod_fcgid_maxrequests' => -1,
 						'guid' => $this->settings['phpfpm']['vhost_httpuser'],
 						'openbasedir' => 0,
-						'safemode' => '0',
 						'email' => $this->settings['panel']['adminmail'],
 						'loginname' => 'froxlor.panel',
 						'documentroot' => $mypath
@@ -255,7 +254,7 @@ class lighttpd
 				$this->lighttpd_data[$vhost_filename] = '';
 			}
 
-			$this->lighttpd_data[$vhost_filename] = 'server.error-handler-404 = "'.$this->settings['defaultwebsrverrhandler']['err404'].'"';
+			$this->lighttpd_data[$vhost_filename] = 'server.error-handler-404 = "'.makeCorrectFile($this->settings['defaultwebsrverrhandler']['err404']).'"';
 		}
 	}
 
@@ -468,27 +467,36 @@ class lighttpd
 			mkDirWithCorrectOwnership($domain['customerroot'], $domain['documentroot'], $domain['guid'], $domain['guid'], true, true);
 
 			$only_webroot = false;
-			if($ssl_vhost === false && $domain['ssl_redirect'] == '1')
-			{
+			if ($ssl_vhost === false
+				&& $domain['ssl_redirect'] == '1'
+			) {
 				$only_webroot = true;
 			}
 			$vhost_content.= $this->getWebroot($domain, $ssl_vhost);
-			if(!$only_webroot)
-			{
+			if (!$only_webroot) {
 				if ($this->_deactivated == false) {
 					$vhost_content.= $this->create_htaccess($domain);
 					$vhost_content.= $this->create_pathOptions($domain);
 					$vhost_content.= $this->composePhpOptions($domain);
 					$vhost_content.= $this->getStats($domain);
 					$vhost_content.= $this->getSslSettings($domain, $ssl_vhost);
+
+					if ($domain['specialsettings'] != "") {
+						$vhost_content.= $domain['specialsettings'] . "\n";
+					}
+
+					if ($ipandport['default_vhostconf_domain'] != '') {
+						$vhost_content.= $ipandport['default_vhostconf_domain'] . "\n";
+					}
+
+					if ($this->settings['system']['default_vhostconf'] != '') {
+						$vhost_content.= $this->settings['system']['default_vhostconf'] . "\n";
+					}
 				}
 				$vhost_content.= $this->getLogFiles($domain);
 			}
 		}
 
-		if ($domain['specialsettings'] != "") {
-			$vhost_content.= $domain['specialsettings'] . "\n";
-		}
 		$vhost_content.= '}' . "\n";
 
 		return $vhost_content;
@@ -526,91 +534,63 @@ class lighttpd
 		return $ssl_settings;
 	}
 
-	protected function getLogFiles($domain)
-	{
+	protected function getLogFiles($domain) {
+
 		$logfiles_text = '';
 		
-		if($domain['speciallogfile'] == '1'
-		   && $this->settings['system']['mod_log_sql'] != '1')
-		{
-			if($domain['parentdomainid'] == '0')
-			{
+		if($domain['speciallogfile'] == '1') {
+
+			if ($domain['parentdomainid'] == '0') {
 				$speciallogfile = '-' . $domain['domain'];
-			}
-			else
-			{
+			} else {
 				$speciallogfile = '-' . $domain['parentdomain'];
 			}
-		}
-		else
-		{
+		} else {
 			$speciallogfile = '';
 		}
 
-		if($this->settings['system']['mod_log_sql'] == 1)
-		{
-			// We are using mod_log_sql (http://www.outoforder.cc/projects/apache/mod_log_sql/)
-			// TODO: See how we are able emulate the error_log
-		}
-		else
-		{
-			// The normal access/error - logging is enabled
-			// error log cannot be set conditionally see
-			// https://redmine.lighttpd.net/issues/665
+		// The normal access/error - logging is enabled
+		// error log cannot be set conditionally see
+		// https://redmine.lighttpd.net/issues/665
 
-			$access_log = makeCorrectFile($this->settings['system']['logfiles_directory'] . $domain['loginname'] . $speciallogfile . '-access.log');
-			// Create the logfile if it does not exist (fixes #46)
-			touch($access_log);
-			chown($access_log, $this->settings['system']['httpuser']);
-			chgrp($access_log, $this->settings['system']['httpgroup']);
+		$access_log = makeCorrectFile($this->settings['system']['logfiles_directory'] . $domain['loginname'] . $speciallogfile . '-access.log');
+		// Create the logfile if it does not exist (fixes #46)
+		touch($access_log);
+		chown($access_log, $this->settings['system']['httpuser']);
+		chgrp($access_log, $this->settings['system']['httpgroup']);
 
-			$logfiles_text.= '  accesslog.filename	= "' . $access_log . '"' . "\n";
-		}
+		$logfiles_text.= '  accesslog.filename	= "' . $access_log . '"' . "\n";
 		
-		if($this->settings['system']['awstats_enabled'] == '1')
-		{
-			if((int)$domain['parentdomainid'] == 0) 
-			{
+		if ($this->settings['system']['awstats_enabled'] == '1') {
+
+			if ((int)$domain['parentdomainid'] == 0) {
 				// prepare the aliases and subdomains for stats config files
-	
 				$server_alias = '';
 				$alias_domains = $this->db->query('SELECT `domain`, `iswildcarddomain`, `wwwserveralias` FROM `' . TABLE_PANEL_DOMAINS . '` 
 												WHERE `aliasdomain`=\'' . $domain['id'] . '\'
 												OR `parentdomainid` =\''. $domain['id']. '\'');
 	
-				while(($alias_domain = $this->db->fetch_array($alias_domains)) !== false)
-				{
+				while (($alias_domain = $this->db->fetch_array($alias_domains)) !== false) {
+
 					$server_alias.= ' ' . $alias_domain['domain'] . ' ';
 	
-					if($alias_domain['iswildcarddomain'] == '1')
-					{
+					if ($alias_domain['iswildcarddomain'] == '1') {
 						$server_alias.= '*.' . $domain['domain'];
-					}
-					else
-					{
-						if($alias_domain['wwwserveralias'] == '1')
-						{
+					} else {
+						if ($alias_domain['wwwserveralias'] == '1') {
 							$server_alias.= 'www.' . $alias_domain['domain'];
-						}
-						else
-						{
+						} else {
 							$server_alias.= '';
 						}
 					}
 				}
 	
-				if($domain['iswildcarddomain'] == '1')
-				{
+				if ($domain['iswildcarddomain'] == '1') {
 					$alias = '*.' . $domain['domain'];
-				}
-				else
-				{
-					if($domain['wwwserveralias'] == '1')
-					{
+				} else {
+					if ($domain['wwwserveralias'] == '1') {
 						$alias = 'www.' . $domain['domain'];
-					}
-					else
-					{
+					} else {
 						$alias = '';
 					}
 				}
@@ -720,7 +700,7 @@ class lighttpd
 				}
 			}
 
-			$diroption_text.= '"' . $row_htpasswds['path'] . '" =>' . "\n";
+			$diroption_text.= '"' . makeCorrectDir($row_htpasswds['path']) . '" =>' . "\n";
 			$diroption_text.= '(' . "\n";
 			$diroption_text.= '   "method"  => "basic",' . "\n";
 			$diroption_text.= '   "realm"   => "'.$row_htpasswds['authname'].'",' . "\n";
@@ -829,7 +809,7 @@ class lighttpd
 		&& $this->settings['system']['deactivateddocroot'] != '')
 		{
 			$webroot_text.= '  # Using docroot for deactivated users...' . "\n";
-			$webroot_text.= '  server.document-root = "' . $this->settings['system']['deactivateddocroot'] . "\"\n";
+			$webroot_text.= '  server.document-root = "' . makeCorrectDir($this->settings['system']['deactivateddocroot']) . "\"\n";
 			$this->_deactivated = true;
 		}
 		else
@@ -867,49 +847,33 @@ class lighttpd
 	*	Lets set the text part for the stats software
 	*/
 
-	protected function getStats($domain)
-	{
+	protected function getStats($domain) {
+
 		$stats_text = '';
 
-		if($domain['speciallogfile'] == '1'
-		   && $this->settings['system']['mod_log_sql'] != '1')
-		{
-			if($domain['parentdomainid'] == '0')
-			{
-				if($this->settings['system']['awstats_enabled'] == '1')
-				{
+		if ($domain['speciallogfile'] == '1') {
+
+			if ($domain['parentdomainid'] == '0') {
+				if ($this->settings['system']['awstats_enabled'] == '1') {
 					$stats_text.= '  alias.url = ( "/awstats/" => "'.makeCorrectFile($domain['customerroot'] . '/awstats/' . $domain['domain']).'" )' . "\n";
 					$stats_text.= '  alias.url += ( "/awstats-icon" => "' . makeCorrectDir($this->settings['system']['awstats_icons']) . '" )' . "\n";
-				}
-				else
-				{
+				} else {
 					$stats_text.= '  alias.url = ( "/webalizer/" => "'.makeCorrectFile($domain['customerroot'] . '/webalizer/' . $domain['domain']).'/" )' . "\n";					
 				}
-			}
-			else
-			{
-				if($this->settings['system']['awstats_enabled'] == '1')
-				{
+			} else {
+				if ($this->settings['system']['awstats_enabled'] == '1') {
 					$stats_text.= '  alias.url = ( "/awstats/" => "'.makeCorrectFile($domain['customerroot'] . '/awstats/' . $domain['parentdomain']).'" )' . "\n";
 					$stats_text.= '  alias.url += ( "/awstats-icon" => "' . makeCorrectDir($this->settings['system']['awstats_icons']) . '" )' . "\n";
-				}
-				else
-				{
+				} else {
 					$stats_text.= '  alias.url = ( "/webalizer/" => "'.makeCorrectFile($domain['customerroot'] . '/webalizer/' . $domain['parentdomain']).'/" )' . "\n";
 				}
 			}
-		}
-		else
-		{
-			if($domain['customerroot'] != $domain['documentroot'])
-			{
-				if($this->settings['system']['awstats_enabled'] == '1')
-				{
+		} else {
+			if ($domain['customerroot'] != $domain['documentroot']) {
+				if ($this->settings['system']['awstats_enabled'] == '1') {
 					$stats_text.= '  alias.url = ( "/awstats/" => "'.makeCorrectFile($domain['customerroot'] . '/awstats/' . $domain['domain']).'" )' . "\n";
 					$stats_text.= '  alias.url += ( "/awstats-icon" => "' . makeCorrectDir($this->settings['system']['awstats_icons']) . '" )' . "\n";
-				} 
-				else
-				{
+				} else {
 					$stats_text.= '  alias.url = ( "/webalizer/" => "'.makeCorrectFile($domain['customerroot'] . '/webalizer/').'" )' . "\n";
 				}
 			}
@@ -917,8 +881,7 @@ class lighttpd
 			// because the stats are in /awstats/[domain], not just /awstats/
 			// also, the awstats-icons are someplace else too!
 			// -> webalizer does not need this!
-			elseif($this->settings['system']['awstats_enabled'] == '1')
-			{
+			elseif ($this->settings['system']['awstats_enabled'] == '1') {
 				$stats_text.= '  alias.url = ( "/awstats/" => "'.makeCorrectFile($domain['documentroot'] . '/awstats/' . $domain['domain']).'" )' . "\n";
 				$stats_text.= '  alias.url += ( "/awstats-icon" => "' . makeCorrectDir($this->settings['system']['awstats_icons']) . '" )' . "\n";
 			}
@@ -984,8 +947,6 @@ class lighttpd
 					fclose($vhosts_file_handler);
 				}
 			}
-
-			$this->wipeOutOldConfigs();
 		}
 
 		// Write the diroptions
@@ -996,69 +957,13 @@ class lighttpd
 			{
 				if(!is_dir($this->settings['system']['apacheconf_htpasswddir']))
 				{
-					mkdir($this->settings['system']['apacheconf_htpasswddir']);
+					mkdir(makeCorrectDir($this->settings['system']['apacheconf_htpasswddir']));
 				}
 
-				$filename = $this->settings['system']['apacheconf_htpasswddir'] . '/' . $key;
+				$filename = makeCorrectFile($this->settings['system']['apacheconf_htpasswddir'] . '/' . $key);
 				$htpasswd_handler = fopen($filename, 'w');
 				fwrite($htpasswd_handler, $data);
 				fclose($htpasswd_handler);
-			}
-		}
-	}
-
-	protected function wipeOutOldConfigs()
-	{
-		fwrite($this->debugHandler, '  lighttpd::wipeOutOldConfigs: cleaning ' . $this->settings['system']['apacheconf_vhost'] . "\n");
-		$this->logger->logAction(CRON_ACTION, LOG_INFO, "cleaning " . $this->settings['system']['apacheconf_vhost']);
-
-		if(isConfigDir($this->settings['system']['apacheconf_vhost'], true))
-		{
-			$vhost_file_dirhandle = opendir($this->settings['system']['apacheconf_vhost']);
-
-			while(false !== ($vhost_filename = readdir($vhost_file_dirhandle)))
-			{
-				if($vhost_filename != '.'
-				&& $vhost_filename != '..'
-				&& !in_array($vhost_filename, $this->known_filenames)
-				&& preg_match('/^(05|10|20|21|22|30|50|51)_(froxlor|syscp)_(dirfix|ipandport|normal_vhost|wildcard_vhost|ssl_vhost)_(.+)\.conf$/', $vhost_filename)
-				&& file_exists(makeCorrectFile($this->settings['system']['apacheconf_vhost'] . '/' . $vhost_filename)))
-				{
-					fwrite($this->debugHandler, '  lighttpd::wipeOutOldConfigs: unlinking ' . $vhost_filename . "\n");
-					$this->logger->logAction(CRON_ACTION, LOG_NOTICE, 'unlinking ' . $vhost_filename);
-					unlink(makeCorrectFile($this->settings['system']['apacheconf_vhost'] . '/' . $vhost_filename));
-				}
-			}
-		}
-		if($this->settings['phpfpm']['enabled'] == '1')
-		{
-			foreach($this->known_vhostfilenames as $vhostfilename){
-				$known_phpfpm_files[]=preg_replace('/^(05|10|20|21|22|30|50|51)_(froxlor|syscp)_(dirfix|ipandport|normal_vhost|wildcard_vhost|ssl_vhost)_/', '', $vhostfilename);
-			}
-		
-			$configdir = $this->settings['phpfpm']['configdir'];
-			$phpfpm_file_dirhandle = opendir($this->settings['phpfpm']['configdir']);
-
-			if ($phpfpm_file_dirhandle !== false) {
-
-				while (false !== ($phpfpm_filename = readdir($phpfpm_file_dirhandle))) {
-
-					if (is_array($known_phpfpm_files)
-						&& $phpfpm_filename != '.'
-						&& $phpfpm_filename != '..'
-						&& !in_array($phpfpm_filename, $known_phpfpm_files)
-						&& file_exists(makeCorrectFile($this->settings['phpfpm']['configdir'] . '/' . $phpfpm_filename))
-					) {
-						fwrite($this->debugHandler, '  lighttpd::wipeOutOldConfigs: unlinking PHP5-FPM ' . $phpfpm_filename . "\n");
-						$this->logger->logAction(CRON_ACTION, LOG_NOTICE, 'unlinking ' . $phpfpm_filename);
-						unlink(makeCorrectFile($this->settings['phpfpm']['configdir'] . '/' . $phpfpm_filename));
-					}
-					if (!is_array($known_phpfpm_files)) {
-						$this->logger->logAction(CRON_ACTION, LOG_WARNING, "WARNING!! PHP-FPM Configs Not written!!");
-					}
-				}
-			} else {
-				$this->logger->logAction(CRON_ACTION, LOG_WARNING, "WARNING!! PHP-FPM configuration path could not be read (".$this->settings['phpfpm']['configdir'].")");
 			}
 		}
 	}

@@ -107,32 +107,32 @@ class nginx
 			} else {
 				$vhosts_folder = makeCorrectDir(dirname($this->settings['system']['apacheconf_vhost']));
 			}
-			
+
 			$vhosts_filename = makeCorrectFile($vhosts_folder . '/05_froxlor_default_errorhandler.conf');
 
 			if(!isset($this->nginx_data[$vhosts_filename]))
 			{
 				$this->nginx_data[$vhosts_filename] = '';
 			}
-	
+
 			if($this->settings['defaultwebsrverrhandler']['err401'] != '')
 			{
-				$this->nginx_data[$vhosts_filename].= 'error_page 401 ' . $this->settings['defaultwebsrverrhandler']['err401'] . ';' . "\n";
+				$this->nginx_data[$vhosts_filename].= 'error_page 401 ' . makeCorrectFile($this->settings['defaultwebsrverrhandler']['err401']) . ';' . "\n";
 			}
 
 			if($this->settings['defaultwebsrverrhandler']['err403'] != '')
 			{
-				$this->nginx_data[$vhosts_filename].= 'error_page 403 ' . $this->settings['defaultwebsrverrhandler']['err403'] . ';' . "\n";
+				$this->nginx_data[$vhosts_filename].= 'error_page 403 ' . makeCorrectFile($this->settings['defaultwebsrverrhandler']['err403']) . ';' . "\n";
 			}
 
 			if($this->settings['defaultwebsrverrhandler']['err404'] != '')
 			{
-				$this->nginx_data[$vhosts_filename].= 'error_page 404 ' . $this->settings['defaultwebsrverrhandler']['err404'] . ';' . "\n";
+				$this->nginx_data[$vhosts_filename].= 'error_page 404 ' . makeCorrectFile($this->settings['defaultwebsrverrhandler']['err404']) . ';' . "\n";
 			}
-			
+
 			if($this->settings['defaultwebsrverrhandler']['err500'] != '')
 			{
-				$this->nginx_data[$vhosts_filename].= 'error_page 500 ' . $this->settings['defaultwebsrverrhandler']['err500'] . ';' . "\n";
+				$this->nginx_data[$vhosts_filename].= 'error_page 500 ' . makeCorrectFile($this->settings['defaultwebsrverrhandler']['err500']) . ';' . "\n";
 			}
 
 		}
@@ -141,135 +141,132 @@ class nginx
 	}
 	public function createFileDirOptions(){
 	}
+
 	public function createIpPort()
 	{
 		$query = "SELECT * FROM `" . TABLE_PANEL_IPSANDPORTS . "` ORDER BY `ip` ASC, `port` ASC";
 		$result_ipsandports = $this->db->query($query);
 
-		while($row_ipsandports = $this->db->fetch_array($result_ipsandports))
-		{
-			if(filter_var($row_ipsandports['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6))
-			{
+		while ($row_ipsandports = $this->db->fetch_array($result_ipsandports)) {
+
+			if (filter_var($row_ipsandports['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
 				$ip = '[' . $row_ipsandports['ip'] . ']';
-				$port = $row_ipsandports['port'];
-			}
-			else
-			{
+			} else {
 				$ip = $row_ipsandports['ip'];
-				$port = $row_ipsandports['port'];
 			}
+			$port = $row_ipsandports['port'];
 
 			fwrite($this->debugHandler, '  nginx::createIpPort: creating ip/port settings for  ' . $ip . ":" . $port . "\n");
 			$this->logger->logAction(CRON_ACTION, LOG_INFO, 'creating ip/port settings for  ' . $ip . ":" . $port);
 			$vhost_filename = makeCorrectFile($this->settings['system']['apacheconf_vhost'] . '/10_froxlor_ipandport_' . trim(str_replace(':', '.', $row_ipsandports['ip']), '.') . '.' . $row_ipsandports['port'] . '.conf');
 
-			if(!isset($this->nginx_data[$vhost_filename]))
-			{
+			if (!isset($this->nginx_data[$vhost_filename])) {
 				$this->nginx_data[$vhost_filename] = '';
 			}
 
-			$this->nginx_data[$vhost_filename].= 'server { ' . "\n";
+			if ($row_ipsandports['vhostcontainer'] == '1') {
 
-			/**
-			 * this HAS to be set for the default host in nginx or else no vhost will work
-			 */
-			$this->nginx_data[$vhost_filename].= "\t". 'listen    ' . $ip . ':' . $port . ' default;' . "\n";
+				$this->nginx_data[$vhost_filename].= 'server { ' . "\n";
 
-			if($row_ipsandports['vhostcontainer'] == '1')
-			{
+				/**
+				 * this HAS to be set for the default host in nginx or else no vhost will work
+				 */
+				$this->nginx_data[$vhost_filename].= "\t". 'listen ' . $ip .':'. $port .' default'. ( $port == 443 ? ' ssl' : null ) .';'. "\n";
+
 				$this->nginx_data[$vhost_filename].= "\t".'# Froxlor default vhost' . "\n";
 				$this->nginx_data[$vhost_filename].= "\t".'server_name    ' . $this->settings['system']['hostname'] . ';' . "\n";
-			}
 
-			$this->nginx_data[$vhost_filename].= "\t".'access_log      /var/log/nginx/access.log;' . "\n";
+				$this->nginx_data[$vhost_filename].= "\t".'access_log      /var/log/nginx/access.log;' . "\n";
 
-			$mypath = '';
-			if($row_ipsandports['vhostcontainer'] == '1')
-			{
-				$mypath = makeCorrectDir(dirname(dirname(dirname(__FILE__))));
+				$mypath = '';
+
+				// no custom docroot set?
+				if ($row_ipsandports['docroot'] == '') {
+					// check whether the hostname should directly point to
+					// the froxlor-installation or not
+					if ($this->settings['system']['froxlordirectlyviahostname']) {
+						$mypath = makeCorrectDir(dirname(dirname(dirname(__FILE__))));
+					} else {
+						$mypath = makeCorrectDir(dirname(dirname(dirname(dirname(__FILE__)))));
+					}
+				} else {
+					// user-defined docroot, #417
+					$mypath = makeCorrectDir($row_ipsandports['docroot']);
+				}
+
 				$this->nginx_data[$vhost_filename].= "\t".'root     '.$mypath.';'."\n";
 				$this->nginx_data[$vhost_filename].= "\t".'location / {'."\n";
 				$this->nginx_data[$vhost_filename].= "\t\t".'index    index.php index.html index.htm;'."\n";
 				$this->nginx_data[$vhost_filename].= "\t".'}'."\n";
 
-				if($row_ipsandports['specialsettings'] != '')
-				{
+				if ($row_ipsandports['specialsettings'] != '') {
 					$this->nginx_data[$vhost_filename].= $row_ipsandports['specialsettings'] . "\n";
 				}
-			}
-				
-			/**
-			 * SSL config options
-			 */
-			if($row_ipsandports['ssl'] == '1')
-			{
-				if($row_ipsandports['ssl_cert_file'] == '')
-				{
-					$row_ipsandports['ssl_cert_file'] = $this->settings['system']['ssl_cert_file'];
-				}
 
-				if($row_ipsandports['ssl_key_file'] == '')
-				{
-					$row_ipsandports['ssl_key_file'] = $this->settings['system']['ssl_key_file'];
-				}
-
-				if($row_ipsandports['ssl_ca_file'] == '')
-				{
-					$row_ipsandports['ssl_ca_file'] = $this->settings['system']['ssl_ca_file'];
-				}
-
-				if($row_ipsandports['ssl_cert_file'] != '')
-				{
-					$this->nginx_data[$vhost_filename].= "\t" . 'ssl on;' . "\n";
-					$this->nginx_data[$vhost_filename].= "\t" . 'ssl_certificate ' . makeCorrectFile($row_ipsandports['ssl_cert_file']) . ';' . "\n";
-					$this->nginx_data[$vhost_filename].= "\t" . 'ssl_certificate_key ' .makeCorrectFile($row_ipsandports['ssl_key_file']) . ';' .  "\n";
-						
-					if($row_ipsandports['ssl_ca_file'] != '')
-					{
+				/**
+				 * SSL config options
+				 */
+				if ($row_ipsandports['ssl'] == '1') {
+					if ($row_ipsandports['ssl_cert_file'] == '') {
+						$row_ipsandports['ssl_cert_file'] = $this->settings['system']['ssl_cert_file'];
+					}
+					if ($row_ipsandports['ssl_key_file'] == '') {
+						$row_ipsandports['ssl_key_file'] = $this->settings['system']['ssl_key_file'];
+					}
+					if ($row_ipsandports['ssl_ca_file'] == '') {
+						$row_ipsandports['ssl_ca_file'] = $this->settings['system']['ssl_ca_file'];
+					}
+					if ($row_ipsandports['ssl_cert_file'] != '') {
+						$this->nginx_data[$vhost_filename].= "\t" . 'ssl on;' . "\n";
+						$this->nginx_data[$vhost_filename].= "\t" . 'ssl_certificate ' . makeCorrectFile($row_ipsandports['ssl_cert_file']) . ';' . "\n";
+					}
+					if ($row_ipsandports['ssl_key_file'] != '') {
+						$this->nginx_data[$vhost_filename].= "\t" . 'ssl_certificate_key ' .makeCorrectFile($row_ipsandports['ssl_key_file']) . ';' .  "\n";
+					}
+					if ($row_ipsandports['ssl_ca_file'] != '') {
 						$this->nginx_data[$vhost_filename].= 'ssl_client_certificate ' . makeCorrectFile($row_ipsandports['ssl_ca_file']) . ';' . "\n";
 					}
 				}
-			}
-			
-			$this->nginx_data[$vhost_filename].= "\t".'location ~ \.php$ {'."\n";
-			$this->nginx_data[$vhost_filename].= "\t\t".'fastcgi_index index.php;'."\n";
-			$this->nginx_data[$vhost_filename].= "\t\t".'include /etc/nginx/fastcgi_params;'."\n";
-			$this->nginx_data[$vhost_filename].= "\t\t".'fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;'."\n";
-			if ($row_ipsandports['ssl'] == '1') {
-				$this->nginx_data[$vhost_filename].= "\t\t".'fastcgi_param HTTPS on;'."\n";
-			}
-			if((int)$this->settings['phpfpm']['enabled'] == 1
-				&& (int)$this->settings['phpfpm']['enabled_ownvhost'] == 1
-			) {
-				$domain = array(
-					'id' => 'none',
-					'domain' => $this->settings['system']['hostname'],
-					'adminid' => 1, /* first admin-user (superadmin) */
-					'mod_fcgid_starter' => -1,
-					'mod_fcgid_maxrequests' => -1,
-					'guid' => $this->settings['phpfpm']['vhost_httpuser'],
-					'openbasedir' => 0,
-					'safemode' => '0',
-					'email' => $this->settings['panel']['adminmail'],
-					'loginname' => 'froxlor.panel',
-					'documentroot' => $mypath,
-				);
 
-				$php = new phpinterface($this->getDB(), $this->settings, $domain);
-				$this->nginx_data[$vhost_filename].= "\t\t".'fastcgi_pass unix:' . $php->getInterface()->getSocketFile() . ';' . "\n";
-			}
-			else
-			{
-				$this->nginx_data[$vhost_filename].= "\t\t".'fastcgi_pass ' . $this->settings['system']['nginx_php_backend'] . ';' . "\n";
-			}
-			$this->nginx_data[$vhost_filename].= "\t".'}'."\n";
+				$this->nginx_data[$vhost_filename].= "\t".'location ~ \.php$ {'."\n";
+				$this->nginx_data[$vhost_filename].= "\t\t".' if (!-f $request_filename) {'."\n";
+				$this->nginx_data[$vhost_filename].= "\t\t\t".'return 404;'."\n";
+				$this->nginx_data[$vhost_filename].= "\t\t".'}'."\n";
+				$this->nginx_data[$vhost_filename].= "\t\t".'fastcgi_index index.php;'."\n";
+				$this->nginx_data[$vhost_filename].= "\t\t".'include '.$this->settings['nginx']['fastcgiparams'].';'."\n";
+				$this->nginx_data[$vhost_filename].= "\t\t".'fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;'."\n";
+				if ($row_ipsandports['ssl'] == '1') {
+					$this->nginx_data[$vhost_filename].= "\t\t".'fastcgi_param HTTPS on;'."\n";
+				}
+				if ((int)$this->settings['phpfpm']['enabled'] == 1
+					&& (int)$this->settings['phpfpm']['enabled_ownvhost'] == 1
+				) {
+					$domain = array(
+						'id' => 'none',
+						'domain' => $this->settings['system']['hostname'],
+						'adminid' => 1, /* first admin-user (superadmin) */
+						'mod_fcgid_starter' => -1,
+						'mod_fcgid_maxrequests' => -1,
+						'guid' => $this->settings['phpfpm']['vhost_httpuser'],
+						'openbasedir' => 0,
+						'email' => $this->settings['panel']['adminmail'],
+						'loginname' => 'froxlor.panel',
+						'documentroot' => $mypath,
+					);
 
-			$this->nginx_data[$vhost_filename].= '}' . "\n\n";
-			// End of Froxlor server{}-part
+					$php = new phpinterface($this->getDB(), $this->settings, $domain);
+					$this->nginx_data[$vhost_filename].= "\t\t".'fastcgi_pass unix:' . $php->getInterface()->getSocketFile() . ';' . "\n";
 
+				} else {
+					$this->nginx_data[$vhost_filename].= "\t\t".'fastcgi_pass ' . $this->settings['system']['nginx_php_backend'] . ';' . "\n";
+				}
+				$this->nginx_data[$vhost_filename].= "\t".'}'."\n";
+				$this->nginx_data[$vhost_filename].= '}' . "\n\n";
+				// End of Froxlor server{}-part
+			}
 			$this->createNginxHosts($row_ipsandports['ip'], $row_ipsandports['port'], $row_ipsandports['ssl'], $vhost_filename);
 		}
-		
+
 		/**
 		 * standard error pages
 		 */
@@ -396,9 +393,13 @@ class nginx
 		}
 
 		$vhost_content = '';
-		$vhost_content.= 'server { ' . "\n";
-		$vhost_content.= "\t" . 'listen ' . $ipport . ';' . "\n";
 
+		// open vhost-container
+		$vhost_content.= 'server { ' . "\n";
+		// listening statement (required)
+		$vhost_content.= "\t" .'listen '. $ipport . ( $ssl_vhost ? ' ssl' : null ) .';'. "\n";
+
+		// get all server-names
 		$vhost_content.= $this->getServerNames($domain);
 
 		// respect ssl_redirect settings, #542
@@ -409,36 +410,43 @@ class nginx
 			$domain['documentroot'] = 'https://' . $domain['domain'] . '/';
 		}
 
-		if(preg_match('/^https?\:\/\//', $domain['documentroot']))
-		{
+		// if the documentroot is an URL we just redirect
+		if (preg_match('/^https?\:\/\//', $domain['documentroot'])) {
 			$vhost_content.= "\t".'rewrite ^(.*) '.$this->idnaConvert->encode($domain['documentroot']).'$1 permanent;'."\n";
-		}
-		else
-		{
+		} else {
 			mkDirWithCorrectOwnership($domain['customerroot'], $domain['documentroot'], $domain['guid'], $domain['guid'], true);
 
 			$vhost_content.= $this->getLogFiles($domain);
 			$vhost_content.= $this->getWebroot($domain, $ssl_vhost);
-			
+
 			if ($this->_deactivated == false) {
 				$vhost_content.= $this->create_pathOptions($domain);
 				$vhost_content.= $this->composePhpOptions($domain, $ssl_vhost);
 
-				$l_regex1="/(location\ \/\ \{)(.*)(\})/smU";
-				$l_regex2="/(location\ \/\ \{.*\})/smU";
-				$replace_by="";
-				$replacements=preg_match_all($l_regex1,$vhost_content,$out);
-				if ($replacements>1){
-					foreach ($out[2] as $val) {
-						$replace_by.=$val."\n";
-					}
-					$vhost_content=preg_replace($l_regex2,"",$vhost_content,$replacements-1);
-					$vhost_content=preg_replace($l_regex2,"location / {"."\n\t\t". $replace_by ."\t}"."\n",$vhost_content);
-				}
-				
 				if ($domain['specialsettings'] != "") {
 					$vhost_content.= $domain['specialsettings'] . "\n";
 				}
+
+				if ($ipandport['default_vhostconf_domain'] != '') {
+					$vhost_content.= $ipandport['default_vhostconf_domain'] . "\n";
+				}
+
+				if ($this->settings['system']['default_vhostconf'] != '') {
+					$vhost_content.= $this->settings['system']['default_vhostconf'] . "\n";
+				}
+			}
+
+			// merge duplicate / sections, #1193
+			$l_regex1="/(location\ \/\ \{)(.*)(\})/smU";
+			$l_regex2="/(location\ \/\ \{.*\})/smU";
+			$replace_by="";
+			$replacements=preg_match_all($l_regex1,$vhost_content,$out);
+			if ($replacements > 1) {
+				foreach ($out[2] as $val) {
+					$replace_by.=$val."\n";
+				}
+				$vhost_content=preg_replace($l_regex2, "", $vhost_content, $replacements-1);
+				$vhost_content=preg_replace($l_regex2, "location / {\n\t\t". $replace_by ."\t}\n", $vhost_content);
 			}
 		}
 		$vhost_content.= '}' . "\n\n";
@@ -446,32 +454,28 @@ class nginx
 		return $vhost_content;
 	}
 
-	protected function create_pathOptions($domain)
-	{
+	protected function create_pathOptions($domain) {
 		$has_location = false;
 
 		$query = "SELECT * FROM " . TABLE_PANEL_HTACCESS . " WHERE `path` LIKE '" . $domain['documentroot'] . "%'";
 		$result = $this->db->query($query);
 
 		$path_options = '';
-
 		$htpasswds = $this->getHtpasswds($domain);
 
-		while($row = $this->db->fetch_array($result))
-		{
-			if(!empty($row['error404path']))
-			{
-				$path_options.= "\t".'error_page   404    ' . $row['error404path'] . ';' . "\n";
+		// for each entry in the htaccess table
+		while ($row = $this->db->fetch_array($result)) {
+
+			if (!empty($row['error404path'])) {
+				$path_options.= "\t".'error_page   404    ' . makeCorrectFile($row['error404path']) . ';' . "\n";
 			}
 
-			if(!empty($row['error403path']))
-			{
-				$path_options.= "\t".'error_page   403    ' . $row['error403path'] . ';' . "\n";
+			if (!empty($row['error403path'])) {
+				$path_options.= "\t".'error_page   403    ' . makeCorrectFile($row['error403path']) . ';' . "\n";
 			}
 
-			if(!empty($row['error500path']))
-			{
-				$path_options.= "\t".'error_page   502 503 504    ' . $row['error500path'] . ';' . "\n";
+			if (!empty($row['error500path'])) {
+				$path_options.= "\t".'error_page   502 503 504    ' . makeCorrectFile($row['error500path']) . ';' . "\n";
 			}
 
 //			if($row['options_indexes'] != '0')
@@ -500,11 +504,12 @@ class nginx
 							switch($single['path']){
 								case '/awstats/':
 								case '/webalizer/':
-								break;
+									// no stats-alias in "location /"-context
+									break;
 								default:
 									if ($single['path']=='/'){
 										$path_options.= "\t\t" . 'auth_basic            "Restricted Area";' . "\n";
-										$path_options.= "\t\t" . 'auth_basic_user_file  ' . $single['usrf'] . ';'."\n";
+										$path_options.= "\t\t" . 'auth_basic_user_file  ' . makeCorrectFile($single['usrf']) . ';'."\n";
 										// remove already used entries so we do not have doubles
 										unset($htpasswds[$idx]);
 									}
@@ -526,7 +531,7 @@ class nginx
 					$path_options.= "\t".'} ' . "\n";
 				}
 //			}
-			
+
 			/**
 			 * Perl support
 			 * required the fastCGI wrapper to be running to receive the CGI requests.
@@ -543,12 +548,12 @@ class nginx
 				}
 				$path_options.= "\t" . 'location ~ \(.pl|.cgi)$ {' . "\n";
 				$path_options.= "\t\t" . 'gzip off; #gzip makes scripts feel slower since they have to complete before getting gzipped' . "\n";
-	    			$path_options.= "\t\t" . 'fastcgi_pass  '. $this->settings['system']['perl_server'] . ';' . "\n";
+	    		$path_options.= "\t\t" . 'fastcgi_pass  '. $this->settings['system']['perl_server'] . ';' . "\n";
    				$path_options.= "\t\t" . 'fastcgi_index index.cgi;' . "\n";
-				$path_options.= "\t\t" . 'include /etc/nginx/fastcgi_params;'."\n";
+				$path_options.= "\t\t" . 'include '.$this->settings['nginx']['fastcgiparams'].';'."\n";
 				$path_options.= "\t" . '}' . "\n";
 			}
-			
+
 		}
 
 		/*
@@ -568,9 +573,9 @@ class nginx
 							unset($htpasswds[$idx]);
 						break;
 						default:
-							$path_options.= "\t" . 'location ' . $single['path'] . ' {' . "\n";
+							$path_options.= "\t" . 'location ' . makeCorrectDir($single['path']) . ' {' . "\n";
 							$path_options.= "\t\t" . 'auth_basic            "Restricted Area";' . "\n";
-							$path_options.= "\t\t" . 'auth_basic_user_file  ' . $single['usrf'] . ';'."\n";
+							$path_options.= "\t\t" . 'auth_basic_user_file  ' . makeCorrectFile($single['usrf']) . ';'."\n";
 							$path_options.= "\t".'}' . "\n";
 					}
 				//}
@@ -581,29 +586,40 @@ class nginx
 		return $path_options;
 	}
 
-	protected function getHtpasswds($domain)
-	{
-		//$query = "SELECT * FROM " . TABLE_PANEL_HTPASSWDS . " WHERE `customerid`='" . $domain['customerid'] . "'";
-		$query = "SELECT DISTINCT * FROM " . TABLE_PANEL_HTPASSWDS . " AS a JOIN " . TABLE_PANEL_DOMAINS . " AS b ON a.customerid=b.customerid WHERE b.customerid='" . $domain['customerid'] . "' AND a.path LIKE CONCAT(b.documentroot,'%') AND b.domain='" . $domain['domain'] . "'" ;
+	protected function getHtpasswds($domain) {
+
+		$query = 'SELECT DISTINCT *
+			FROM ' . TABLE_PANEL_HTPASSWDS . ' AS a
+			JOIN ' . TABLE_PANEL_DOMAINS . ' AS b
+			USING (`customerid`)
+			WHERE b.customerid=' . $domain['customerid'] . ' AND b.domain="' . $domain['domain'] . '";';
 
 		$result = $this->db->query($query);
 
 		$returnval = array();
 		$x = 0;
-		while($row_htpasswds = $this->db->fetch_array($result))
-		{
-			if(count($row_htpasswds) > 0)
-			{
+		while ($row_htpasswds = $this->db->fetch_array($result)) {
+
+			if (count($row_htpasswds) > 0) {
 				$htpasswd_filename = makeCorrectFile($this->settings['system']['apacheconf_htpasswddir'] . '/' . $row_htpasswds['customerid'] . '-' . md5($row_htpasswds['path']) . '.htpasswd');
 
-				if(!isset($this->htpasswds_data[$htpasswd_filename]))
-				{
+				// ensure we can write to the array with index $htpasswd_filename
+				if (!isset($this->htpasswds_data[$htpasswd_filename])) {
 					$this->htpasswds_data[$htpasswd_filename] = '';
 				}
 
 				$this->htpasswds_data[$htpasswd_filename].= $row_htpasswds['username'] . ':' . $row_htpasswds['password'] . "\n";
 
-				$path = makeCorrectDir(substr($row_htpasswds['path'], strlen($domain['documentroot']) - 1));
+				// if the domains and their web contents are located in a subdirectory of
+				// the nginx user, we have to evaluate the right path which is to protect
+				if (stripos($row_htpasswds['path'], $domain['documentroot']) !== false ) {
+					// if the website contents is located in the user directory
+					$path = makeCorrectDir(substr($row_htpasswds['path'], strlen($domain['documentroot']) - 1));
+				} else {
+					// if the website contents is located in a subdirectory of the user
+					preg_match('/^([\/[:print:]]*\/)([[:print:]\/]+){1}$/i', $row_htpasswds['path'], $matches);
+					$path = makeCorrectDir(substr($row_htpasswds['path'], strlen($matches[1]) - 1));
+				}
 
 				$returnval[$x]['path'] = $path;
 				$returnval[$x]['root'] = makeCorrectDir($domain['documentroot']);
@@ -625,7 +641,7 @@ class nginx
 			$phpopts.= "\t\t".'fastcgi_index index.php;'."\n";
 			$phpopts.= "\t\t".'fastcgi_pass ' . $this->settings['system']['nginx_php_backend'] . ';' . "\n";
 			$phpopts.= "\t\t".'fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;'."\n";
-			$phpopts.= "\t\t".'include /etc/nginx/fastcgi_params;'."\n";
+			$phpopts.= "\t\t".'include '.$this->settings['nginx']['fastcgiparams'].';'."\n";
 			if ($domain['ssl'] == '1' && $ssl_vhost) {
 				$phpopts.= "\t\t".'fastcgi_param HTTPS on;'."\n";
 			}
@@ -642,7 +658,7 @@ class nginx
 		&& $this->settings['system']['deactivateddocroot'] != '')
 		{
 			$webroot_text.= "\t".'# Using docroot for deactivated users...' . "\n";
-			$webroot_text.= "\t".'root     '.$this->settings['system']['deactivateddocroot'].';'."\n";
+			$webroot_text.= "\t".'root     '.makeCorrectDir($this->settings['system']['deactivateddocroot']).';'."\n";
 			$this->_deactivated = true;
 		}
 		else
@@ -651,7 +667,7 @@ class nginx
 			$this->_deactivated = false;
 		}
 
-		$webroot_text.= "\t".'location / {'."\n";
+		$webroot_text.= "\n\t".'location / {'."\n";
 		$webroot_text.= "\t\t".'index    index.php index.html index.htm;'."\n";
 		$webroot_text.= "\t\t" . 'try_files $uri $uri/ @rewrites;'."\n";
 
@@ -662,132 +678,58 @@ class nginx
 
 		$webroot_text.= "\t".'}'."\n\n";
 		$webroot_text.= "\tlocation @rewrites {\n";
-		$webroot_text.= "rewrite ^ /index.php last;\n";
-		$webroot_text.= "}\n\n";
+		$webroot_text.= "\t\trewrite ^ /index.php last;\n";
+		$webroot_text.= "\t}\n\n";
 
 		return $webroot_text;
 	}
 
-	protected function getStats($domain,$single=array())
-	{
+	protected function getStats($domain, $single) {
+
 		$stats_text = '';
 
-		if($domain['speciallogfile'] == '1'
-		&& $this->settings['system']['mod_log_sql'] != '1')
-		{
-			if($domain['parentdomainid'] == '0')
-			{
-				if($this->settings['system']['awstats_enabled'] == '1')
-				{
-					$stats_text.= "\t" . 'location /awstats {' . "\n";
-					$stats_text.= "\t\t" . 'alias ' . makeCorrectFile($domain['customerroot'] . '/awstats/' . $domain['domain']) . ';' . "\n";
-					$stats_text.= "\t\t" . 'auth_basic            "Restricted Area";' . "\n";
-					$stats_text.= "\t\t" . 'auth_basic_user_file  ' . $single['usrf'] . ';'."\n";
-					$stats_text.= "\t" . '}' . "\n";
-					$stats_text.= "\t" . 'location /awstats-icon {' . "\n";
-					$stats_text.= "\t\t" . 'alias ' . makeCorrectDir($this->settings['system']['awstats_icons']) . ';' . "\n";
-					$stats_text.= "\t" . '}' . "\n";
-				}
-				else
-				{
-					$stats_text.= "\t" . 'location /webalizer {' . "\n";
-					$stats_text.= "\t\t" . 'alias ' .  makeCorrectFile($domain['customerroot'] . '/webalizer/' . $domain['domain']) . ';' . "\n";
-					$stats_text.= "\t\t" . 'auth_basic            "Restricted Area";' . "\n";
-					$stats_text.= "\t\t" . 'auth_basic_user_file  ' . $single['usrf'] . ';'."\n";
-					$stats_text.= "\t" . '}' . "\n";
-				}
-			}
-			else
-			{
-				if($this->settings['system']['awstats_enabled'] == '1')
-				{
-					$stats_text.= "\t" . 'location /awstats {' . "\n";
-					$stats_text.= "\t\t" . 'alias ' . makeCorrectFile($domain['customerroot'] . '/awstats/' . $domain['parentdomain']) . ';' . "\n";
-					$stats_text.= "\t\t" . 'auth_basic            "Restricted Area";' . "\n";
-					$stats_text.= "\t\t" . 'auth_basic_user_file  ' . $single['usrf'] . ';'."\n";
-					$stats_text.= "\t" . '}' . "\n";
-					$stats_text.= "\t" . 'location /awstats-icon {' . "\n";
-					$stats_text.= "\t\t" . 'alias ' . makeCorrectDir($this->settings['system']['awstats_icons']) . ';' . "\n";
-					$stats_text.= "\t" . '}' . "\n";
-				}
-				else
-				{
-					$stats_text.= "\t" . 'location /webalizer {' . "\n";
-					$stats_text.= "\t\t" . 'alias ' .  makeCorrectFile($domain['customerroot'] . '/webalizer/' . $domain['parentdomain']) . ';' . "\n";
-					$stats_text.= "\t\t" . 'auth_basic            "Restricted Area";' . "\n";
-					$stats_text.= "\t\t" . 'auth_basic_user_file  ' . $single['usrf'] . ';'."\n";
-					$stats_text.= "\t" . '}' . "\n";
-
-				}
-			}
+		// define basic path to the stats
+		if ($this->settings['system']['awstats_enabled'] == '1') {
+			$alias_dir = makeCorrectFile($domain['customerroot'] . '/awstats/');
+		} else {
+			$alias_dir = makeCorrectFile($domain['customerroot'] . '/webalizer/');
 		}
-		else
-		{
-			if($domain['customerroot'] != $domain['documentroot'])
-			{
-				if($this->settings['system']['awstats_enabled'] == '1')
-				{
-					$stats_text.= "\t" . 'location /awstats {' . "\n";
-					$stats_text.= "\t\t" . 'alias ' . makeCorrectFile($domain['customerroot'] . '/awstats/' . $domain['domain']) . ';' . "\n";
-					$stats_text.= "\t\t" . 'auth_basic            "Restricted Area";' . "\n";
-					$stats_text.= "\t\t" . 'auth_basic_user_file  ' . $single['usrf'] . ';'."\n";
-					$stats_text.= "\t" . '}' . "\n";
-					$stats_text.= "\t" . 'location /awstats-icon {' . "\n";
-					$stats_text.= "\t\t" . 'alias ' . makeCorrectDir($this->settings['system']['awstats_icons']) . ';' . "\n";
-					$stats_text.= "\t\t" . '}' . "\n";
-				}
-				else
-				{
-					$stats_text.= "\t" . 'location /webalizer {' . "\n";
-					$stats_text.= "\t\t" . 'root ' .  makeCorrectFile($domain['customerroot'] . '/webalizer/' . $domain['domain']) . ';' . "\n";
-					$stats_text.= "\t\t" . 'auth_basic            "Restricted Area";' . "\n";
-					$stats_text.= "\t\t" . 'auth_basic_user_file  ' . $single['usrf'] . ';'."\n";
-					$stats_text.= "\t" . '}' . "\n";
 
-				}
-			}
-			// if the docroots are equal, we still have to set an alias for awstats
-			// because the stats are in /awstats/[domain], not just /awstats/
-			// also, the awstats-icons are someplace else too!
-			// -> webalizer does not need this!
-			elseif($this->settings['system']['awstats_enabled'] == '1')
-			{
-				$stats_text.= "\t" . 'location /awstats {' . "\n";
-				$stats_text.= "\t\t" . 'alias ' . makeCorrectFile($domain['documentroot'] . '/awstats/' . $domain['domain']) . ';' . "\n";
-				$stats_text.= "\t\t" . 'auth_basic            "Restricted Area";' . "\n";
-				$stats_text.= "\t\t" . 'auth_basic_user_file  ' . $single['usrf'] . ';'."\n";
-				$stats_text.= "\t" . '}' . "\n";
-				$stats_text.= "\t" . 'location /awstats-icon {' . "\n";
-				$stats_text.= "\t\t" . 'alias ' . makeCorrectDir($this->settings['system']['awstats_icons']) . ';' . "\n";
-				$stats_text.= "\t" . '}' . "\n";
-			}
+		// if this is a parentdomain, we use this domain-name
+		if ($domain['parentdomainid'] == '0') {
+			$alias_dir = makeCorrectDir($alias_dir.'/'.$domain['domain']);
+		} else {
+			$alias_dir = makeCorrectDir($alias_dir.'/'.$domain['parentdomain']);
 		}
-		
+
+		if ($this->settings['system']['awstats_enabled'] == '1') {
+			// awstats
+			$stats_text.= "\t" . 'location /awstats {' . "\n";
+		} else {
+			// webalizer
+			$stats_text.= "\t" . 'location /webalizer {' . "\n";
+		}
+
+		$stats_text.= "\t\t" . 'alias ' . $alias_dir . ';' . "\n";
+		$stats_text.= "\t\t" . 'auth_basic            "Restricted Area";' . "\n";
+		$stats_text.= "\t\t" . 'auth_basic_user_file  ' . makeCorrectFile($single['usrf']) . ';'."\n";
+		$stats_text.= "\t" . '}' . "\n\n";
 
 		return $stats_text;
 	}
 
-	/**
-	 * @TODO mod_log_sql
-	 */
-	protected function getLogFiles($domain)
-	{
+	protected function getLogFiles($domain) {
+
 		$logfiles_text = '';
 
-		if($domain['speciallogfile'] == '1'
-		&& $this->settings['system']['mod_log_sql'] != '1')
-		{
-			if($domain['parentdomainid'] == '0')
-			{
+		if ($domain['speciallogfile'] == '1') {
+
+			if ($domain['parentdomainid'] == '0') {
 				$speciallogfile = '-' . $domain['domain'];
-			}
-			else
-			{
+			} else {
 				$speciallogfile = '-' . $domain['parentdomain'];
 			}
-		}
-		else
-		{
+		} else {
 			$speciallogfile = '';
 		}
 
@@ -807,50 +749,34 @@ class nginx
 		$logfiles_text.= "\t".'access_log    ' . $access_log . ' combined;' . "\n";
 		$logfiles_text.= "\t".'error_log    ' . $error_log . ' error;' . "\n";
 
-		if($this->settings['system']['awstats_enabled'] == '1')
-		{
-			if((int)$domain['parentdomainid'] == 0)
-			{
+		if ($this->settings['system']['awstats_enabled'] == '1') {
+			if ((int)$domain['parentdomainid'] == 0) {
 				// prepare the aliases and subdomains for stats config files
-
 				$server_alias = '';
 				$alias_domains = $this->db->query('SELECT `domain`, `iswildcarddomain`, `wwwserveralias` FROM `' . TABLE_PANEL_DOMAINS . '`
 												WHERE `aliasdomain`=\'' . $domain['id'] . '\'
 												OR `parentdomainid` =\''. $domain['id']. '\'');
 
-				while(($alias_domain = $this->db->fetch_array($alias_domains)) !== false)
-				{
+				while (($alias_domain = $this->db->fetch_array($alias_domains)) !== false) {
 					$server_alias.= ' ' . $alias_domain['domain'] . ' ';
 
-					if($alias_domain['iswildcarddomain'] == '1')
-					{
+					if ($alias_domain['iswildcarddomain'] == '1') {
 						$server_alias.= '*.' . $domain['domain'];
-					}
-					else
-					{
-						if($alias_domain['wwwserveralias'] == '1')
-						{
+					} else {
+						if ($alias_domain['wwwserveralias'] == '1') {
 							$server_alias.= 'www.' . $alias_domain['domain'];
-						}
-						else
-						{
+						} else {
 							$server_alias.= '';
 						}
 					}
 				}
 
-				if($domain['iswildcarddomain'] == '1')
-				{
+				if ($domain['iswildcarddomain'] == '1') {
 					$alias = '*.' . $domain['domain'];
-				}
-				else
-				{
-					if($domain['wwwserveralias'] == '1')
-					{
+				} else {
+					if ($domain['wwwserveralias'] == '1') {
 						$alias = 'www.' . $domain['domain'];
-					}
-					else
-					{
+					} else {
 						$alias = '';
 					}
 				}
@@ -928,13 +854,13 @@ class nginx
 		{
 			// Save one big file
 			$vhosts_file = '';
-				
+
 			// sort by filename so the order is:
 			// 1. subdomains
 			// 2. subdomains as main-domains
 			// 3. main-domains
 			ksort($this->nginx_data);
-				
+
 			foreach($this->nginx_data as $vhosts_filename => $vhost_content)
 			{
 				$vhosts_file.= $vhost_content . "\n\n";
@@ -976,9 +902,6 @@ class nginx
 				}
 
 			}
-				
-			$this->wipeOutOldVhostConfigs();
-				
 		}
 
 		/*
@@ -1009,94 +932,9 @@ class nginx
 					fwrite($htpasswd_file_handler, $htpasswd_file);
 					fclose($htpasswd_file_handler);
 				}
-
-				$this->wipeOutOldHtpasswdConfigs();
-			}
-		}
-	}
-
-	protected function wipeOutOldVhostConfigs()
-	{
-		fwrite($this->debugHandler, '  nginx::wipeOutOldVhostConfigs: cleaning ' . $this->settings['system']['apacheconf_vhost'] . "\n");
-		$this->logger->logAction(CRON_ACTION, LOG_INFO, "cleaning " . $this->settings['system']['apacheconf_vhost']);
-
-		if(isConfigDir($this->settings['system']['apacheconf_vhost'], true))
-		{
-			$vhost_file_dirhandle = opendir($this->settings['system']['apacheconf_vhost']);
-
-			while(false !== ($vhost_filename = readdir($vhost_file_dirhandle)))
-			{
-				if($vhost_filename != '.'
-				&& $vhost_filename != '..'
-				&& !in_array($vhost_filename, $this->known_filenames)
-				&& preg_match('/^(05|10|20|21|22|30|50|51)_(froxlor|syscp)_(dirfix|ipandport|normal_vhost|wildcard_vhost|ssl_vhost)_(.+)\.conf$/', $vhost_filename)
-				&& file_exists(makeCorrectFile($this->settings['system']['apacheconf_vhost'] . '/' . $vhost_filename)))
-				{
-					fwrite($this->debugHandler, '  nginx::wipeOutOldVhostConfigs: unlinking ' . $vhost_filename . "\n");
-					$this->logger->logAction(CRON_ACTION, LOG_NOTICE, 'unlinking ' . $vhost_filename);
-					unlink(makeCorrectFile($this->settings['system']['apacheconf_vhost'] . '/' . $vhost_filename));
-				}
-			}
-		}
-		if($this->settings['phpfpm']['enabled'] == '1')
-		{
-			foreach($this->known_vhostfilenames as $vhostfilename){
-				$known_phpfpm_files[]=preg_replace('/^(05|10|20|21|22|30|50|51)_(froxlor|syscp)_(dirfix|ipandport|normal_vhost|wildcard_vhost|ssl_vhost)_/', '', $vhostfilename);
-			}
-		
-			$configdir = $this->settings['phpfpm']['configdir'];
-			$phpfpm_file_dirhandle = opendir($this->settings['phpfpm']['configdir']);
-
-			if ($phpfpm_file_dirhandle !== false) {
-
-				while (false !== ($phpfpm_filename = readdir($phpfpm_file_dirhandle))) {
-
-					if (is_array($known_phpfpm_files)
-						&& $phpfpm_filename != '.'
-						&& $phpfpm_filename != '..'
-						&& !in_array($phpfpm_filename, $known_phpfpm_files)
-						&& file_exists(makeCorrectFile($this->settings['phpfpm']['configdir'] . '/' . $phpfpm_filename))
-					) {
-						fwrite($this->debugHandler, '  nginx::wipeOutOldVhostConfigs: unlinking PHP5-FPM ' . $phpfpm_filename . "\n");
-						$this->logger->logAction(CRON_ACTION, LOG_NOTICE, 'unlinking ' . $phpfpm_filename);
-						unlink(makeCorrectFile($this->settings['phpfpm']['configdir'] . '/' . $phpfpm_filename));
-					}
-					if (!is_array($known_phpfpm_files)) {
-						$this->logger->logAction(CRON_ACTION, LOG_WARNING, "WARNING!! PHP-FPM Configs Not written!!");
-					}
-				}
-			} else {
-				$this->logger->logAction(CRON_ACTION, LOG_WARNING, "WARNING!! PHP-FPM configuration path could not be read (".$this->settings['phpfpm']['configdir'].")");
-			}
-		}
-	}
-
-	/*
-	 *	We remove old htpasswd config files
-	 */
-	protected function wipeOutOldHtpasswdConfigs()
-	{
-		fwrite($this->debugHandler, '  nginx::wipeOutOldHtpasswdConfigs: cleaning ' . $this->settings['system']['apacheconf_htpasswddir'] . "\n");
-		$this->logger->logAction(CRON_ACTION, LOG_INFO, "cleaning " . $this->settings['system']['apacheconf_htpasswddir']);
-
-		if(isConfigDir($this->settings['system']['apacheconf_htpasswddir'])
-		&& file_exists($this->settings['system']['apacheconf_htpasswddir'])
-		&& is_dir($this->settings['system']['apacheconf_htpasswddir']))
-		{
-			$htpasswds_file_dirhandle = opendir($this->settings['system']['apacheconf_htpasswddir']);
-
-			while(false !== ($htpasswd_filename = readdir($htpasswds_file_dirhandle)))
-			{
-				if($htpasswd_filename != '.'
-				&& $htpasswd_filename != '..'
-				&& !in_array($htpasswd_filename, $this->known_htpasswdsfilenames)
-				&& file_exists(makeCorrectFile($this->settings['system']['apacheconf_htpasswddir'] . '/' . $htpasswd_filename)))
-				{
-					fwrite($this->debugHandler, '  nginx::wipeOutOldHtpasswdConfigs: unlinking ' . $htpasswd_filename . "\n");
-					$this->logger->logAction(CRON_ACTION, LOG_NOTICE, 'unlinking ' . $htpasswd_filename);
-					unlink(makeCorrectFile($this->settings['system']['apacheconf_htpasswddir'] . '/' . $htpasswd_filename));
-				}
 			}
 		}
 	}
 }
+
+?>

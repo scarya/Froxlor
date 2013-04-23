@@ -50,7 +50,6 @@ $lng['login']['profile_lng'] = 'Profiel taal';
  * Customer
  */
 
-$lng['customer']['documentroot'] = 'Home directory';
 $lng['customer']['name'] = 'Naam';
 $lng['customer']['firstname'] = 'Voornaam';
 $lng['customer']['company'] = 'Bedrijfsnaam';
@@ -63,11 +62,7 @@ $lng['customer']['email'] = 'Email';
 $lng['customer']['customernumber'] = 'Klant ID';
 $lng['customer']['diskspace'] = 'Webruimte (MB)';
 $lng['customer']['traffic'] = 'Verkeer (GB)';
-$lng['customer']['mysqls'] = 'MySQL-Databases';
 $lng['customer']['emails'] = 'E-mail-Adressen';
-$lng['customer']['accounts'] = 'E-mail-Accounts';
-$lng['customer']['forwarders'] = 'E-mail-Forwarders';
-$lng['customer']['ftps'] = 'FTP-Accounts';
 $lng['customer']['subdomains'] = 'Sub-Domein(en)';
 $lng['customer']['domains'] = 'Domein(en)';
 $lng['customer']['unlimited'] = 'onbeperkt';
@@ -79,18 +74,9 @@ $lng['customer']['unlimited'] = 'onbeperkt';
 $lng['menue']['main']['main'] = 'Main';
 $lng['menue']['main']['changepassword'] = 'Wijzig wachtwoord';
 $lng['menue']['main']['changelanguage'] = 'Wijzig taal';
-$lng['menue']['email']['email'] = 'E-mail';
 $lng['menue']['email']['emails'] = 'Adressen';
-$lng['menue']['email']['webmail'] = 'WebMail';
-$lng['menue']['mysql']['mysql'] = 'MySQL';
-$lng['menue']['mysql']['databases'] = 'Databases';
-$lng['menue']['mysql']['phpmyadmin'] = 'phpMyAdmin';
 $lng['menue']['domains']['domains'] = 'Domeinen';
 $lng['menue']['domains']['settings'] = 'Instellingen';
-$lng['menue']['ftp']['ftp'] = 'FTP';
-$lng['menue']['ftp']['accounts'] = 'Accounts';
-$lng['menue']['ftp']['webftp'] = 'WebFTP';
-$lng['menue']['extras']['extras'] = 'Extras';
 $lng['menue']['extras']['directoryprotection'] = 'Map beveiliging';
 $lng['menue']['extras']['pathoptions'] = 'pad opties';
 
@@ -134,12 +120,10 @@ $lng['emails']['emails_add'] = 'Maak nieuw e-mail adres';
 $lng['emails']['emails_edit'] = 'Bewerk e-mail-adres';
 $lng['emails']['catchall'] = 'Catchall';
 $lng['emails']['iscatchall'] = 'Definieer als catchall-adres?';
-$lng['emails']['account'] = 'Account';
 $lng['emails']['account_add'] = 'Maak nieuw account';
 $lng['emails']['account_delete'] = 'Verwijder account';
 $lng['emails']['from'] = 'Van';
 $lng['emails']['to'] = 'Aan';
-$lng['emails']['forwarders'] = 'Forwarders';
 $lng['emails']['forwarder_add'] = 'Maak forwarder';
 
 /**
@@ -167,10 +151,6 @@ $lng['extras']['view_directory'] = 'map inhoud laten zien';
 $lng['extras']['pathoptions_add'] = 'Pad opties toevoegen';
 $lng['extras']['directory_browsing'] = 'map inhoud browsen';
 $lng['extras']['pathoptions_edit'] = 'Pad opties bewerken';
-$lng['extras']['error404path'] = '404';
-$lng['extras']['error403path'] = '403';
-$lng['extras']['error500path'] = '500';
-$lng['extras']['error401path'] = '401';
 $lng['extras']['errordocument404path'] = 'URL naar Foutdocument 404';
 $lng['extras']['errordocument403path'] = 'URL naar Foutdocument 403';
 $lng['extras']['errordocument500path'] = 'URL naar Foutdocument 500';
@@ -191,7 +171,7 @@ $lng['error']['firstdeleteallsubdomains'] = 'U moet eerst alle subdomeinen verwi
 $lng['error']['youhavealreadyacatchallforthisdomain'] = 'U heeft al een catchall voor dit domein aangemaakt.';
 $lng['error']['ftp_cantdeletemainaccount'] = 'U kunt uw hoofd FTP account niet verwijderen';
 $lng['error']['login'] = 'De door u ingegeven gebruikersnaam en wacthwoord zijn verkeerd. Probeer opnieuw!';
-$lng['error']['login_blocked'] = 'Dit account is inactief vanwege teveel login fouten. <br />Probeer het nog eens over ' . $settings['login']['deactivatetime'] . ' seconden.';
+$lng['error']['login_blocked'] = 'Dit account is inactief vanwege teveel login fouten. <br />Probeer het nog eens over %s seconden.';
 $lng['error']['notallreqfieldsorerrors'] = 'U heeft niet alle velden goed, of helemaal niet ingevuld.';
 $lng['error']['oldpasswordnotcorrect'] = 'Het oude wachtwoord is niet correct.';
 $lng['error']['youcantallocatemorethanyouhave'] = 'U kunt niet meer resources gebruiken dan dat u bezit.';
@@ -199,17 +179,7 @@ $lng['error']['mustbeurl'] = 'U heeft geen goed of compleet URL ingegeven (bijv.
 $lng['error']['invalidpath'] = 'U heeft geen goed URL ingegeven (misschien een probleem met dirlisting?)';
 $lng['error']['stringisempty'] = 'Geen waarde in invoerveld';
 $lng['error']['stringiswrong'] = 'Verkeerde waarde in invoerveld';
-$lng['error']['myloginname'] = '\'' . $lng['login']['username'] . '\'';
-$lng['error']['mypassword'] = '\'' . $lng['login']['password'] . '\'';
-$lng['error']['oldpassword'] = '\'' . $lng['changepassword']['old_password'] . '\'';
-$lng['error']['newpassword'] = '\'' . $lng['changepassword']['new_password'] . '\'';
-$lng['error']['newpasswordconfirm'] = '\'' . $lng['changepassword']['new_password_confirm'] . '\'';
 $lng['error']['newpasswordconfirmerror'] = 'Het nieuwe wacthwoord en de bevestiging zijn niet gelijk';
-$lng['error']['myname'] = '\'' . $lng['customer']['name'] . '\'';
-$lng['error']['myfirstname'] = '\'' . $lng['customer']['firstname'] . '\'';
-$lng['error']['emailadd'] = '\'' . $lng['customer']['email'] . '\'';
-$lng['error']['mydomain'] = '\'Domain\'';
-$lng['error']['mydocumentroot'] = '\'Documentroot\'';
 $lng['error']['loginnameexists'] = 'Loginnaam %s bestaat al';
 $lng['error']['emailiswrong'] = 'E-mail Adres %s bevat illegale karakters of is niet compleet';
 $lng['error']['loginnameiswrong'] = 'Loginnaame %s bevat illegale karakters';
@@ -234,7 +204,6 @@ $lng['error']['destinationnonexist'] = 'Maak uw forwarder in het veld \'Destinat
 $lng['error']['destinationalreadyexistasmail'] = 'De forwarder naar %s bestaat reeds als actief e-mail adres.';
 $lng['error']['destinationalreadyexist'] = 'U heeft al een forwarder die verwijst naar %s .';
 $lng['error']['destinationiswrong'] = 'De forwarder naar %s bevat illegale karakter(s) of is niet compleet.';
-$lng['error']['domainname'] = $lng['domains']['domainname'];
 
 /**
  * Questions
@@ -272,12 +241,10 @@ $lng['mails']['createcustomer']['subject'] = 'Account informatie';
 $lng['admin']['overview'] = 'Overzicht';
 $lng['admin']['ressourcedetails'] = 'Gebruikte resources';
 $lng['admin']['systemdetails'] = 'Systeem Details';
-$lng['admin']['froxlordetails'] = 'Froxlor Details';
 $lng['admin']['installedversion'] = 'Geinstalleerde Versie';
 $lng['admin']['latestversion'] = 'Laatste Versie';
 $lng['admin']['lookfornewversion']['clickhere'] = 'zoeken via webservice';
 $lng['admin']['lookfornewversion']['error'] = 'Fout tijdens lezen';
-$lng['admin']['resources'] = 'Resources';
 $lng['admin']['customer'] = 'Klant';
 $lng['admin']['customers'] = 'Klanten';
 $lng['admin']['customer_add'] = 'Maak klant';
@@ -303,7 +270,7 @@ $lng['admin']['deactivated_user'] = 'Gebruiker deactiveren';
 $lng['admin']['sendpassword'] = 'Verstuur wachtwoord';
 $lng['admin']['ownvhostsettings'] = 'Eigen vHost-Instellingen';
 $lng['admin']['configfiles']['serverconfiguration'] = 'Configuratie';
-$lng['admin']['configfiles']['files'] = '<b>Configuratiebestanden:</b> Wijzig de volgende bestanden of maak ze aan met<br />de volgende inhoud als u dit nog niet gedaan heeft.<br /><b>Let Op:</b> Het MySQL-wachtwoord is niet aangepast vanwege beveiligings overwegingen.<br />Vervang &quot;MYSQL_PASSWORD&quot; zelf. Als u uw MYSQl wachtwoord vergeten bent<br />kunt u het terugvinden in &quot;lib/userdata.inc.php&quot;.';
+$lng['admin']['configfiles']['files'] = '<b>Configuratiebestanden:</b> Wijzig de volgende bestanden of maak ze aan met<br />de volgende inhoud als u dit nog niet gedaan heeft.<br /><b>Let Op:</b> Het MySQL-wachtwoord is niet aangepast vanwege beveiligings overwegingen.<br />Vervang "MYSQL_PASSWORD" zelf. Als u uw MYSQl wachtwoord vergeten bent<br />kunt u het terugvinden in "lib/userdata.inc.php".';
 $lng['admin']['configfiles']['commands'] = '<b>Commando\'s:</b> Start de volgende commando\'s in een shell.';
 $lng['admin']['configfiles']['restart'] = '<b>Herstarten:</b> Start de volgende commando\'s in een shell zodat de configuratie opnieuw geladen wordt.';
 $lng['admin']['templates']['templates'] = 'Sjablonen';
@@ -411,21 +378,21 @@ $lng['domain']['openbasedirpath'] = 'OpenBasedir-pad';
 $lng['domain']['docroot'] = 'Pad van bovenstaand veld';
 $lng['domain']['homedir'] = 'Home directory';
 $lng['admin']['valuemandatory'] = 'Deze waarde is verplicht';
-$lng['admin']['valuemandatorycompany'] = 'De waarde &quot;naam&quot; en &quot;voornaam&quot; of &quot;bedrijf&quot; moet ingevoerd worden';
+$lng['admin']['valuemandatorycompany'] = 'De waarde "naam" en "voornaam" of "bedrijf" moet ingevoerd worden';
 $lng['menue']['main']['username'] = 'Ingelogged als: ';
 $lng['panel']['urloverridespath'] = 'URL (Vervangd path)';
 $lng['panel']['pathorurl'] = 'Pad of URL';
-$lng['error']['sessiontimeoutiswrong'] = 'Alleen nummerieke &quot;Session Timeout&quot; zijn toegestaan.';
-$lng['error']['maxloginattemptsiswrong'] = 'Alleen nummerieke &quot;Maximaal aantal inlogpogingen&quot; zijn toegestaan.';
-$lng['error']['deactivatetimiswrong'] = 'Allee nummerieke &quot;Deactivatie Tijd&quot; zijn toegestaan.';
-$lng['error']['accountprefixiswrong'] = 'Het &quot;Klan voorvoegsel&quot; is verkeerd.';
-$lng['error']['mysqlprefixiswrong'] = 'Het &quot;SQL voorvoegsel&quot; is verkeerd.';
-$lng['error']['ftpprefixiswrong'] = 'Het &quot;FTP voorvoegsel&quot; is verkeerd.';
-$lng['error']['ipiswrong'] = 'Het &quot;IP-Adres&quot; is verkeerd. Alleen een geldig ip-adres is toegestaan.';
-$lng['error']['vmailuidiswrong'] = 'Het &quot;Mails-uid&quot; is verkeerd. Alleen een nummeriek UID is toegestaan.';
-$lng['error']['vmailgidiswrong'] = 'Het &quot;Mails-gid&quot; is verkeerd. Alleen een nummeriek GID is toegestaan.';
-$lng['error']['adminmailiswrong'] = 'Het &quot;Afzender-adres&quot; is verkeerd. Alleen geldige e-mail adressen zijn toegestaan.';
-$lng['error']['pagingiswrong'] = 'Het aantal &quot;Vermeldingen per pagina&quot; is verkeerd. Alleen nummerieke karakters zijn toegestaan.';
+$lng['error']['sessiontimeoutiswrong'] = 'Alleen nummerieke "Session Timeout" zijn toegestaan.';
+$lng['error']['maxloginattemptsiswrong'] = 'Alleen nummerieke "Maximaal aantal inlogpogingen" zijn toegestaan.';
+$lng['error']['deactivatetimiswrong'] = 'Allee nummerieke "Deactivatie Tijd" zijn toegestaan.';
+$lng['error']['accountprefixiswrong'] = 'Het "Klan voorvoegsel" is verkeerd.';
+$lng['error']['mysqlprefixiswrong'] = 'Het "SQL voorvoegsel" is verkeerd.';
+$lng['error']['ftpprefixiswrong'] = 'Het "FTP voorvoegsel" is verkeerd.';
+$lng['error']['ipiswrong'] = 'Het "IP-Adres" is verkeerd. Alleen een geldig ip-adres is toegestaan.';
+$lng['error']['vmailuidiswrong'] = 'Het "Mails-uid" is verkeerd. Alleen een nummeriek UID is toegestaan.';
+$lng['error']['vmailgidiswrong'] = 'Het "Mails-gid" is verkeerd. Alleen een nummeriek GID is toegestaan.';
+$lng['error']['adminmailiswrong'] = 'Het "Afzender-adres" is verkeerd. Alleen geldige e-mail adressen zijn toegestaan.';
+$lng['error']['pagingiswrong'] = 'Het aantal "Vermeldingen per pagina" is verkeerd. Alleen nummerieke karakters zijn toegestaan.';
 $lng['error']['phpmyadminiswrong'] = 'De phpMyAdmin-link is niet een geldige link.';
 $lng['error']['webmailiswrong'] = 'De WebMail-link is niet een geldige link.';
 $lng['error']['webftpiswrong'] = 'De WebFTP-link is niet een geldige link.';
@@ -444,23 +411,21 @@ $lng['panel']['translator'] = 'Vertaler';
 
 // ADDED IN 1.2.14-rc4
 
-$lng['error']['stringformaterror'] = 'De waarde voor het veld &quot;%s&quot; is niet in het verwachte formaat.';
+$lng['error']['stringformaterror'] = 'De waarde voor het veld "%s" is niet in het verwachte formaat.';
 
 // ADDED IN 1.2.15-rc1
 
-$lng['admin']['serversoftware'] = 'Serversoftware';
 $lng['admin']['phpversion'] = 'PHP-Versie';
 $lng['admin']['phpmemorylimit'] = 'PHP-Geheugen-Limiet';
 $lng['admin']['mysqlserverversion'] = 'MySQL Server Versie';
 $lng['admin']['mysqlclientversion'] = 'MySQL Client Versie';
-$lng['admin']['webserverinterface'] = 'Webserver Interface';
 $lng['domains']['isassigneddomain'] = 'Is toegewezen domein';
 $lng['serversettings']['phpappendopenbasedir']['title'] = 'Pad wat toegevoegd word aan OpenBasedir';
 $lng['serversettings']['phpappendopenbasedir']['description'] = 'Deze paden (gescheiden door dubbele punten) zullen worden toegevoegd aan het OpenBasedir-statement in iedere vhost-container.';
 
 // CHANGED IN 1.2.15-rc1
 
-$lng['error']['loginnameissystemaccount'] = 'U kunt geen accounts aanmaken die gelijk zijn aan systeem accounts (bijvoorbeeld beginnend met &quot;%s&quot;). Kies een andere accountnaam AUB.';
+$lng['error']['loginnameissystemaccount'] = 'U kunt geen accounts aanmaken die gelijk zijn aan systeem accounts (bijvoorbeeld beginnend met "%s"). Kies een andere accountnaam AUB.';
 $lng['error']['youcantdeleteyourself'] = 'U kunt uw eigen account, omwille van veiligheidsredenen, niet verwijderen.';
 $lng['error']['youcanteditallfieldsofyourself'] = 'Opmerking: U kunt, om veiligheidsredenen, niet alle velden van uw account aanpassen.';
 
@@ -513,12 +478,6 @@ $lng['admin']['configfiles']['overview'] = 'Overzicht';
 $lng['admin']['configfiles']['wizard'] = 'Wizard';
 $lng['admin']['configfiles']['distribution'] = 'Distributie';
 $lng['admin']['configfiles']['service'] = 'Dienst';
-$lng['admin']['configfiles']['daemon'] = 'Daemon';
-$lng['admin']['configfiles']['http'] = 'Webserver (HTTP)';
-$lng['admin']['configfiles']['dns'] = 'Nameserver (DNS)';
-$lng['admin']['configfiles']['mail'] = 'Mailserver (IMAP/POP3)';
-$lng['admin']['configfiles']['smtp'] = 'Mailserver (SMTP)';
-$lng['admin']['configfiles']['ftp'] = 'FTP-Server';
 $lng['admin']['configfiles']['etc'] = 'Overigen (Systeem)';
 $lng['admin']['configfiles']['choosedistribution'] = '-- Kies een distributie --';
 $lng['admin']['configfiles']['chooseservice'] = '-- Kies een dienst --';
@@ -532,8 +491,6 @@ $lng['panel']['back'] = 'Back';
 
 // ADDED IN 1.2.16-svn12
 
-$lng['serversettings']['mod_log_sql']['title'] = 'Logs tijdelijk opslaan in de database';
-$lng['serversettings']['mod_log_sql']['description'] = 'Gebruike <a target="blank" href="http://www.outoforder.cc/projects/apache/mod_log_sql/" title="mod_log_sql">mod_log_sql</a> om toegangslogs tijdelijk in de database op te slaan<br /><b>Dit vereist een speciale <a target="blank" href="http://files.froxlor.org/docs/mod_log_sql/" title="mod_log_sql - documentation">configuratie van Apache</a>!</b>';
 $lng['serversettings']['mod_fcgid']['title'] = 'PHP insluiten via mod_fcgid/suexec';
 $lng['serversettings']['mod_fcgid']['description'] = 'Gebruik mod_fcgid/suexec/libnss_mysql om PHP uit te voeren onder het gebruikersaccount.<br/><b>Dit vereist een aangepaste configuratie van de webserver. Alle volgende optie\'s zijn alleen geldig wanneer deze module actief is.</b>';
 $lng['serversettings']['sendalternativemail']['title'] = 'Gebruik alternatief emailadres';
@@ -546,7 +503,7 @@ $lng['admin']['templates']['EMAIL_PASSWORD'] = 'Vervangen door het POP3/IMAP-wac
 
 // ADDED IN 1.2.16-svn13
 
-$lng['error']['documentrootexists'] = 'De map &quot;%s&quot; voor deze klant bestaat reeds. Verwijder deze map alvorens het account aan te maken.';
+$lng['error']['documentrootexists'] = 'De map "%s" voor deze klant bestaat reeds. Verwijder deze map alvorens het account aan te maken.';
 
 // ADDED IN 1.2.16-svn14
 
@@ -585,7 +542,7 @@ $lng['ticket']['admin_email'] = 'root@localhost';
 $lng['ticket']['noreply_email'] = 'tickets@froxlor';
 $lng['admin']['ticketsystem'] = 'Ondersteuningstickets';
 $lng['menue']['ticket']['ticket'] = 'Ondersteuningstickets';
-$lng['menue']['ticket']['categories'] = 'Ondersteuningscategorie&euml;n';
+$lng['menue']['ticket']['categories'] = 'Ondersteuningscategorieën';
 $lng['menue']['ticket']['archive'] = 'Ticket-archief';
 $lng['ticket']['description'] = 'Hier kunt u hulpverzoeken naar uw beheerder sturen.<br /> Notificatie\'s worden verzonden via email.';
 $lng['ticket']['ticket_new'] = 'Een nieuw ticket openen';
@@ -654,13 +611,9 @@ $lng['question']['ticket_reallyclose'] = 'Weet u zeker dat u ticket "%s" wilt sl
 $lng['question']['ticket_reallydelete'] = 'Weet u zeker dat u ticket "%s" wilt verwijderen?';
 $lng['question']['ticket_reallydeletecat'] = 'Weet u zeker dat u de categorie "%s" wilt verwijderen?';
 $lng['question']['ticket_reallyarchive'] = 'Weet u zeker dat u ticket "%s" wilt archiveren?';
-$lng['error']['mysubject'] = '\'' . $lng['ticket']['subject'] . '\'';
-$lng['error']['mymessage'] = '\'' . $lng['ticket']['message'] . '\'';
-$lng['error']['mycategory'] = '\'' . $lng['ticket']['category'] . '\'';
 $lng['error']['nomoreticketsavailable'] = 'U hebt al uw beschikbare tickets verbruikt. Neem contact op met uw beheerder.';
 $lng['error']['nocustomerforticket'] = 'U kunt geen tickets aanmaken zonder gebruikers';
 $lng['error']['categoryhastickets'] = 'Deze categorie bevat nog tickets.<br />Verwijder de tickets eerst alvorens de categorie te verwijderen';
-$lng['error']['notmorethanxopentickets'] = $lng['ticket']['notmorethanxopentickets'];
 $lng['admin']['ticketsettings'] = 'Instellingen voor ondersteuningstickets';
 $lng['admin']['archivelastrun'] = 'Laatste archivering tickets';
 $lng['serversettings']['ticket']['noreply_email']['title'] = 'Emailadres voor geen-antwoord';
@@ -681,8 +634,8 @@ $lng['customer']['tickets'] = 'Ondersteuningstickets';
 $lng['admin']['domain_nocustomeraddingavailable'] = 'Het is niet mogelijk een domein toe te voegen. U dient tenminste een klant aan te maken.';
 $lng['serversettings']['ticket']['enable'] = 'Ticketsysteem inschakelijk';
 $lng['serversettings']['ticket']['concurrentlyopen'] = 'Hoeveel tickets kunnen per keer open staan?';
-$lng['error']['norepymailiswrong'] = 'Het &quot;geen-antwoord-adres&quot; is onjuist. Alleen geldige emailadressen zijn toegestaan.';
-$lng['error']['tadminmailiswrong'] = 'Het &quot;Ticketbeheerder-adres&quot; is onjuist. Alleen geldige emailadressen zijn toegestaan.';
+$lng['error']['norepymailiswrong'] = 'Het "geen-antwoord-adres" is onjuist. Alleen geldige emailadressen zijn toegestaan.';
+$lng['error']['tadminmailiswrong'] = 'Het "Ticketbeheerder-adres" is onjuist. Alleen geldige emailadressen zijn toegestaan.';
 $lng['ticket']['awaitingticketreply'] = 'U hebt %s onbeantwoorde ondersteuningsticket(s)';
 
 // ADDED IN 1.2.18-svn5
@@ -745,7 +698,7 @@ $lng['serversettings']['logger']['types']['description'] = 'Om meerdere types te
 $lng['serversettings']['logger']['logfile'] = 'Pad naar logfile, inclusief bestandsnaam';
 $lng['error']['logerror'] = 'Log-Fout: %s';
 $lng['serversettings']['logger']['logcron'] = 'Cronjobs loggen (eenmalig)';
-$lng['question']['logger_reallytruncate'] = 'Weet u zeker dat u de tabel &quot;%s&quot; wilt legen?';
+$lng['question']['logger_reallytruncate'] = 'Weet u zeker dat u de tabel "%s" wilt legen?';
 $lng['admin']['loggersystem'] = 'Systeemlog';
 $lng['menue']['logger']['logger'] = 'Systeemlog';
 $lng['logger']['date'] = 'Datum';
@@ -766,7 +719,7 @@ $lng['error']['nomessagetosend'] = 'U hebt geen bericht opgegeven.';
 $lng['error']['noreceipientsgiven'] = 'U hebt geen ontvanger opgegeven';
 $lng['admin']['emaildomain'] = 'Emaildomein';
 $lng['admin']['email_only'] = 'Alleen email?';
-$lng['admin']['wwwserveralias'] = 'Voeg een &quot;www.&quot; ServerAlias toe';
+$lng['admin']['wwwserveralias'] = 'Voeg een "www." ServerAlias toe';
 $lng['admin']['ipsandports']['enable_ssl'] = 'Is dit een SSL-poort?';
 $lng['admin']['ipsandports']['ssl_cert_file'] = 'Pad naar SSL-certificaat';
 $lng['panel']['send'] = 'verzenden';
@@ -775,13 +728,12 @@ $lng['admin']['receipient'] = 'Ontvanger';
 $lng['admin']['message'] = 'Bericht schrijven';
 $lng['admin']['text'] = 'Bericht';
 $lng['menu']['message'] = 'Berichten';
-$lng['error']['errorsendingmail'] = 'Het versturen van het bericht naar &quot;%s&quot; is mislukt';
-$lng['error']['cannotreaddir'] = 'De map &quot;%s&quot; kan niet gelezen worden';
+$lng['error']['errorsendingmail'] = 'Het versturen van het bericht naar "%s" is mislukt';
+$lng['error']['cannotreaddir'] = 'De map "%s" kan niet gelezen worden';
 $lng['message']['success'] = 'Bericht verzonden naar ontvagers %s';
 $lng['message']['noreceipients'] = 'Er is geen email verstuurd omdat er geen ontvangers in de database zijn';
 $lng['admin']['sslsettings'] = 'Instellingen voor SSL';
 $lng['cronjobs']['notyetrun'] = 'Nog niet uitgevoerd';
-$lng['install']['servername_should_be_fqdn'] = 'De servernaam dient een FQDN te zijn en geen IP-adres';
 $lng['serversettings']['default_vhostconf']['title'] = 'Standaard vhost-instellingen';
 $lng['serversettings']['default_vhostconf']['description'] = 'De inhoud van dit veld wordt rechtstreeks in de vhost-container geplaatst. N.B.: Deze code wordt niet op fouten gecontroleerd. In geval van fouten kan het zijn dat de webserver niet meer start!';
 $lng['error']['invalidip'] = '%s is een ongeldig IP-adres';
@@ -799,9 +751,6 @@ $lng['dkim']['dkim_dkimkeys']['description'] = '<em>Bestandsnaam</em> van het DK
 $lng['dkim']['dkimrestart_command']['title'] = 'Herstart-commando voor Milter';
 $lng['dkim']['dkimrestart_command']['description'] = 'Geef het commando om de milter-plugin te herstarten';
 
-// ADDED IN 1.2.19-svn9
-
-$lng['admin']['caneditphpsettings'] = 'Can change php-related domain settings?';
 
 // ADDED IN 1.2.19-svn12
 
@@ -865,7 +814,7 @@ $lng['pwdreminder']['notallowed'] = 'Het opnieuw instellen van wachtwoorden is u
 
 $lng['serversettings']['awstats_path']['title'] = 'Pad naar AWstats cgi-bin-map';
 $lng['serversettings']['awstats_path']['description'] = 'bijvoorbeeld /usr/share/webapps/awstats/6.1/webroot/cgi-bin/';
-$lng['serversettings']['awstats_updateall_command']['title'] = 'Pad naar &quot;awstats_updateall.pl&quot;';
+$lng['serversettings']['awstats_updateall_command']['title'] = 'Pad naar "awstats_updateall.pl"';
 $lng['serversettings']['awstats_updateall_command']['description'] = 'bijvoorbeeld /usr/bin/awstats_updateall.pl';
 
 // ADDED IN 1.2.19-svn21
@@ -917,7 +866,7 @@ $lng['customer']['mail_quota'] = 'Mailquotum';
 $lng['panel']['megabyte'] = 'MegaByte';
 $lng['panel']['not_supported'] = 'Wordt niet ondersteund in: ';
 $lng['emails']['quota_edit'] = 'E-mailquotum aanpassen';
-$lng['error']['allocatetoomuchquota'] = 'U probeerde %s MB ' . $lng['emails']['quota'] . ' toe te kennen, maar u heeft niet voldoende over.';
+$lng['error']['allocatetoomuchquota'] = 'U probeerde %s MB Quotum toe te kennen, maar u heeft niet voldoende over.';
 
 // Autoresponder module
 
@@ -968,7 +917,6 @@ $lng['error']['phpsettingidwrong'] = 'Een configuratie voor PHP met dit ID besta
 $lng['error']['descriptioninvalid'] = 'De omschrijving is te kort, te lang of bevat ongeldige karakters.';
 $lng['error']['info'] = 'Informatie';
 $lng['admin']['phpconfig']['template_replace_vars'] = 'Variabelen die worden vervangen in de instellingen';
-$lng['admin']['phpconfig']['safe_mode'] = 'Wordt vervangen door de safe_mode-instellingen voor het domein.';
 $lng['admin']['phpconfig']['pear_dir'] = 'Wordt vervangen door de globale pear-map.';
 $lng['admin']['phpconfig']['open_basedir_c'] = 'Voegt een ; (puntkomma) toe om open_basedir in- of uit te schakelen';
 $lng['admin']['phpconfig']['open_basedir'] = 'Wordt vervangen door de open_basedir-instellingen voor het domein.';
@@ -1024,7 +972,7 @@ $lng['aps']['data'] = 'Data';
 $lng['aps']['version'] = 'Versie';
 $lng['aps']['homepage'] = 'Homepage';
 $lng['aps']['installed_size'] = 'Grootte na installatie';
-$lng['aps']['categories'] = 'Categorieën';
+$lng['aps']['categories'] = 'CategorieÃ«n';
 $lng['aps']['languages'] = 'Talen';
 $lng['aps']['long_description'] = 'Lange omschrijving';
 $lng['aps']['configscript'] = 'Configuratiescript';
@@ -1123,7 +1071,7 @@ $lng['question']['reallywanttoremove'] = '<strong>Weet u zeker dat u dit pakket 
 $lng['aps']['searchoneresult'] = '%s pakket gevonden';
 $lng['aps']['searchmultiresult'] = '%s pakketten gevonden';
 $lng['question']['reallywanttostop'] = 'Weet u zeker dat u de installatie van dit pakket wilt afbreken?<br/><br/>';
-$lng['aps']['packagenameandversion'] = 'Pakket &amp; versie';
+$lng['aps']['packagenameandversion'] = 'Pakket & versie';
 $lng['aps']['package_locked'] = 'Vergrendeld';
 $lng['aps']['package_enabled'] = 'Beschikbaar';
 $lng['aps']['lock'] = 'Vergrendelen';
@@ -1132,7 +1080,7 @@ $lng['aps']['remove'] = 'Verwijderen';
 $lng['aps']['allpackages'] = 'Alle pakketten';
 $lng['question']['reallyremovepackages'] = '<strong>Weet u zeker dat u deze pakketten wilt verwijderen?</strong><br/><br/>Pakketten met afhankelijkheden kunnen alleen verwijderd worden indien de betreffende afhankelijkheden zijn verwijderd!<br/><br/>';
 $lng['aps']['nopackagesinsystem'] = 'Er zijn geen pakketten op dit systeem geinstalleerd die beheerd kunnen worden.';
-$lng['aps']['packagenameandstatus'] = 'Pakket &amp; status';
+$lng['aps']['packagenameandstatus'] = 'Pakket & status';
 $lng['aps']['activate_aps']['title'] = 'APS Installatieprogramma inschakelen';
 $lng['aps']['activate_aps']['description'] = 'Het APS installatieprogramma kan hier ingeschakeld worden.';
 $lng['aps']['packages_per_page']['title'] = 'Pakketten per pagina';
@@ -1201,13 +1149,9 @@ $lng['serversettings']['mod_fcgid']['maxrequests']['title'] = 'Maximaal aantal v
 $lng['serversettings']['mod_fcgid']['maxrequests']['description'] = 'Toegestane aantal verzoeken per domein';
 
 // fix bug #1124
-$lng['admin']['webserver'] = 'Webserver';
 $lng['error']['admin_domain_emailsystemhostname'] = 'De naam van de server kan niet gebruikt worden als domein voor e-mail.';
 $lng['aps']['license_link'] = 'Koppeling naar licentie';
 
-// ADDED IN 1.4.2.1-1
-
-$lng['mysql']['mysql_server'] = 'MySQL-Server';
 
 // ADDED IN 1.4.2.1-2
 
@@ -1222,7 +1166,6 @@ $lng['serversettings']['ssl']['ssl_ca_file'] = 'Pad naar SSL CA certificaat';
 
 $lng['error']['usernamealreadyexists'] = 'De gebruikersnaam %s is reeds in gebruik.';
 
-$lng['error']['plausibilitychecknotunderstood'] = 'Answer of plausibility check not understood.';
 $lng['error']['errorwhensaving'] = 'Fout tijdens opslaan veld %s';
 
 $lng['success']['success'] = 'Informatie';
@@ -1275,7 +1218,7 @@ $lng['admin']['newerversionavailable'] = 'Er is een nieuwe versie van Froxlor be
 // ADDED IN FROXLOR 0.9.3
 
 $lng['emails']['noemaildomainaddedyet'] = 'U hebt nog geen (email-)domein gekoppeld aan uw account.';
-$lng['error']['hiddenfieldvaluechanged'] = 'De waarde van het verborgen veld &quot;%s&quot; is gewijzigd tijdens het aanpassen van de instellingen.<br /><br />Dit is normaliter geen groot probleem maar heeft wel verhinderd dat de instellingen niet zijn opgeslagen.';
+$lng['error']['hiddenfieldvaluechanged'] = 'De waarde van het verborgen veld "%s" is gewijzigd tijdens het aanpassen van de instellingen.<br /><br />Dit is normaliter geen groot probleem maar heeft wel verhinderd dat de instellingen niet zijn opgeslagen.';
 
 // ADDED IN FROXLOR 0.9.3-svn1
 
@@ -1296,7 +1239,7 @@ $lng['dkim']['dkim_algorithm']['title'] = 'Toegestane hash-algoritmen';
 $lng['dkim']['dkim_algorithm']['description'] = 'Toegestane hash-algoritmen, kies "Alle" voor alle algoritmen of 1 of meerdere van onderstaande';
 $lng['dkim']['dkim_servicetype'] = 'Type services';
 $lng['dkim']['dkim_keylength']['title'] = 'Lengte sleutel';
-$lng['dkim']['dkim_keylength']['description'] = 'Let op: Indien u deze waarde wijzigt, dient u allen geheime en publieke sleutels in "'.$settings['dkim']['dkim_prefix'].'" te verwijderen';
+$lng['dkim']['dkim_keylength']['description'] = 'Let op: Indien u deze waarde wijzigt, dient u allen geheime en publieke sleutels in "%s" te verwijderen';
 $lng['dkim']['dkim_notes']['title'] = 'Notities voor DKIM';
 $lng['dkim']['dkim_notes']['description'] = 'Notities die van belang kunnen zijn voor mensen, bijvoorbeeld een URL als http://www.dnswatch.info. Geen enkel programma zal deze informatie verwerken. Deze informatie dient schaars te zijn gezien de beperkte ruimte in DNS. Dit is bedoeld voor beheerders, niet voor eindgebruikers.';
 $lng['dkim']['dkim_add_adsp']['title'] = 'DKIM ADSP toevoegen';
@@ -1358,12 +1301,12 @@ $lng['ticket']['orderdesc'] = 'Hier kunt u uw eigen logische volgorde instellen 
 // ADDED IN FROXLOR 0.9.6-svn3
 $lng['serversettings']['defaultwebsrverrhandler_enabled'] = 'Standaard foutdocumenten voor alle klanten activeren';
 $lng['serversettings']['defaultwebsrverrhandler_err401']['title'] = 'Bestand/URL voor foutcode 401';
-$lng['serversettings']['defaultwebsrverrhandler_err401']['description'] = '<div style="color:red">'.$lng['panel']['not_supported'].'lighttpd</div>';
+$lng['serversettings']['defaultwebsrverrhandler_err401']['description'] = '<div style="color:red">Wordt niet ondersteund in: lighttpd</div>';
 $lng['serversettings']['defaultwebsrverrhandler_err403']['title'] = 'Bestand/URL voor foutcode 403';
-$lng['serversettings']['defaultwebsrverrhandler_err403']['description'] = '<div style="color:red">'.$lng['panel']['not_supported'].'lighttpd</div>';
+$lng['serversettings']['defaultwebsrverrhandler_err403']['description'] = '<div style="color:red">Wordt niet ondersteund in: lighttpd</div>';
 $lng['serversettings']['defaultwebsrverrhandler_err404'] = 'Bestand/URL voor foutcode 404';
 $lng['serversettings']['defaultwebsrverrhandler_err500']['title'] = 'Bestand/URL voor foutcode 500';
-$lng['serversettings']['defaultwebsrverrhandler_err500']['description'] = '<div style="color:red">'.$lng['panel']['not_supported'].'lighttpd</div>';
+$lng['serversettings']['defaultwebsrverrhandler_err500']['description'] = '<div style="color:red">Wordt niet ondersteund in: lighttpd</div>';
 
 // ADDED IN FROXLOR 0.9.6-svn4
 $lng['serversettings']['ticket']['default_priority'] = 'Standaardprioriteit voor support-tickets';
@@ -1439,7 +1382,7 @@ $lng['admin']['perl_settings'] = 'Perl/CGI';
 $lng['serversettings']['perl']['suexecworkaround']['title'] = 'Om SuExec heenwerken (Geldt alleen voor Apache)';
 $lng['serversettings']['perl']['suexecworkaround']['description'] = 'Schakel dit alleen in indien de documentmappen van klanten niet in het pad van Apache SuExec vallen.<br />Indien ingeschakeld zal Froxlor een symbolische link maken voor het pad waarvoor Perl actief is + /cgi-bin/.<br />Merk op dat Perl dan alleen werkt in de submap /cgi-bin/ en niet in de map zelf (zoals het werkt zonder deze oplossing!)';
 $lng['serversettings']['perl']['suexeccgipath']['title'] = 'Pad naar symbolische links naar Perl-mappen van klanten';
-$lng['serversettings']['perl']['suexeccgipath']['description'] = 'U dient dit alleen op te geven indien &quot;Om SuExec heenwerken&quot; actief is.<br />LET OP: Zorg ervoor dat deze map onder het pad van SuExec valt, anders is deze oplossing waardeloos';
+$lng['serversettings']['perl']['suexeccgipath']['description'] = 'U dient dit alleen op te geven indien "Om SuExec heenwerken" actief is.<br />LET OP: Zorg ervoor dat deze map onder het pad van SuExec valt, anders is deze oplossing waardeloos';
 $lng['panel']['descriptionerrordocument'] = 'Kan een URL, pad naar een bestand of een tekenreeks zijn die is omsloten door " "<br />Laat leeg voor de standaardwaarde.';
 $lng['error']['stringerrordocumentnotvalidforlighty'] = 'Een tekenreeks als ErrorDocuemtn werkt niet in lighttpd. Geef een pad naar een bestand';
 $lng['error']['urlerrordocumentnotvalidforlighty'] = 'Een tekenreeks als ErrorDocuemtn werkt niet in lighttpd. Geef een pad naar een bestand';

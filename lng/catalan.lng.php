@@ -166,10 +166,6 @@ $lng['extras']['view_directory'] = 'mostra el contingut del directori';
 $lng['extras']['pathoptions_add'] = 'afegir opcions de la ruta (PATH)';
 $lng['extras']['directory_browsing'] = 'navegar pel contingut del directori';
 $lng['extras']['pathoptions_edit'] = 'editar opcions de la ruta (PATH)';
-$lng['extras']['error404path'] = '404';
-$lng['extras']['error403path'] = '403';
-$lng['extras']['error500path'] = '500';
-$lng['extras']['error401path'] = '401';
 $lng['extras']['errordocument404path'] = 'Ruta a ErrorDocument 404';
 $lng['extras']['errordocument403path'] = 'Ruta a ErrorDocument 403';
 $lng['extras']['errordocument500path'] = 'Ruta a ErrorDocument 500';
@@ -190,7 +186,7 @@ $lng['error']['firstdeleteallsubdomains'] = 'No pots esborrar tots els subdomini
 $lng['error']['youhavealreadyacatchallforthisdomain'] = 'Ja tens un compte comod&iacute;';
 $lng['error']['ftp_cantdeletemainaccount'] = 'No pots esborrar el compte principal FTP';
 $lng['error']['login'] = 'El nom d\'usuari o la Clau s&oacute;n incorrectes. Sisplau torna-ho a intentar!';
-$lng['error']['login_blocked'] = 'Aquest compte ha estat susp&egrave;s a causa de massa intents fraudulents d\'identificaci&oacute;. <br />Si us plau, torna a provar-ho en ' . $settings['login']['deactivatetime'] . ' segons.';
+$lng['error']['login_blocked'] = 'Aquest compte ha estat susp&egrave;s a causa de massa intents fraudulents d\'identificaci&oacute;. <br />Si us plau, torna a provar-ho en %s segons.';
 $lng['error']['notallreqfieldsorerrors'] = 'No has omplert tots els camps o algun camp &eacute;s incorrecte.';
 $lng['error']['oldpasswordnotcorrect'] = 'La clau antiga no &eacute;s la correcta.';
 $lng['error']['youcantallocatemorethanyouhave'] = 'No pots ocupar m&eacute;s espai del que tens assignat!';
@@ -198,15 +194,7 @@ $lng['error']['mustbeurl'] = 'No has escrit una URL correcte';
 $lng['error']['invalidpath'] = 'No has escrit una URL v&agrave;lida (potser hi ha algun problema en el llistat de directoris)';
 $lng['error']['stringisempty'] = 'Camp de text buit';
 $lng['error']['stringiswrong'] = 'Contingut erroni en el camp de text';
-$lng['error']['myloginname'] = '\'' . $lng['login']['username'] . '\'';
-$lng['error']['mypassword'] = '\'' . $lng['login']['password'] . '\'';
-$lng['error']['oldpassword'] = '\'' . $lng['changepassword']['old_password'] . '\'';
-$lng['error']['newpassword'] = '\'' . $lng['changepassword']['new_password'] . '\'';
-$lng['error']['newpasswordconfirm'] = '\'' . $lng['changepassword']['new_password_confirm'] . '\'';
 $lng['error']['newpasswordconfirmerror'] = 'La nova clau no coincideix amb la confirmaci&oacute;';
-$lng['error']['myname'] = '\'' . $lng['customer']['name'] . '\'';
-$lng['error']['myfirstname'] = '\'' . $lng['customer']['firstname'] . '\'';
-$lng['error']['emailadd'] = '\'' . $lng['customer']['email'] . '\'';
 $lng['error']['mydomain'] = '\'Domini\'';
 $lng['error']['mydocumentroot'] = '\'Arrel dels documents\'';
 $lng['error']['loginnameexists'] = 'Ja existeix l\'usuari %s';
@@ -233,7 +221,6 @@ $lng['error']['destinationnonexist'] = 'Si us plau crea la redirecci&oacute; a \
 $lng['error']['destinationalreadyexistasmail'] = 'La redirecci&oacute; a %s ja existeix com un compte de correu.';
 $lng['error']['destinationalreadyexist'] = 'Ja hi ha una redirecci&oacute; a %s .';
 $lng['error']['destinationiswrong'] = 'La redirecci&oacute; %s cont&eacute; car&agrave;cters inv&agrave;lids o &eacute;s incompleta.';
-$lng['error']['domainname'] = $lng['domains']['domainname'];
 
 /**
  * Questions
@@ -259,9 +246,9 @@ $lng['question']['admin_configs_reallyrebuild'] = 'Segur que vols regenerar les 
  * Mails
  */
 
-$lng['mails']['pop_success']['mailbody'] = 'Hola,\n\nel teu compte d\'email $destination\ns\'ha creat satisfactoriament.\n\nAix� &eacute;s un missatge creat autom&agrave;ticament, si us plau uno responguis. Gr&agrave;cies.';
+$lng['mails']['pop_success']['mailbody'] = 'Hola,\n\nel teu compte d\'email {EMAIL}\ns\'ha creat satisfactoriament.\n\nAix� &eacute;s un missatge creat autom&agrave;ticament, si us plau uno responguis. Gr&agrave;cies.';
 $lng['mails']['pop_success']['subject'] = 'Compte de correu creat satisfactoriament';
-$lng['mails']['createcustomer']['mailbody'] = 'Hola {FIRSTNAME} {NAME},\n\n aqu&iacute; te la seva informaci&oacute;:\n\nNom d\'usuari: $loginname\nClau: $password\n\n Gr&agrave;cies per tot, disfruta del teu compte';
+$lng['mails']['createcustomer']['mailbody'] = 'Hola {FIRSTNAME} {NAME},\n\n aqu&iacute; te la seva informaci&oacute;:\n\nNom d\'usuari: {USERNAME}\nClau: {PASSWORD}\n\n Gr&agrave;cies per tot, disfruta del teu compte';
 $lng['mails']['createcustomer']['subject'] = 'Informaci&oacute; del compte';
 
 /**
@@ -388,8 +375,3 @@ $lng['question']['admin_ip_reallydelete'] = 'Segur que vols esborrar la IP %s?';
 $lng['admin']['ipsandports']['ipsandports'] = 'IPs i Ports';
 $lng['admin']['ipsandports']['add'] = 'Afegir IP/Port';
 $lng['admin']['ipsandports']['edit'] = 'Editar IP/Port';
-$lng['admin']['ipsandports']['ipandport'] = 'IP/Port';
-$lng['admin']['ipsandports']['ip'] = 'IP';
-$lng['admin']['ipsandports']['port'] = 'Port';
-
-?>

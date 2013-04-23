@@ -26,7 +26,7 @@
  */
 function parseAndOutputPreconfig(&$has_preconfig, &$return, $current_version)
 {
-	global $settings, $lng, $db;
+	global $settings, $lng, $db, $theme;
 
 	if(versionInUpdate($current_version, '0.9.4-svn2'))
 	{
@@ -158,7 +158,7 @@ function parseAndOutputPreconfig(&$has_preconfig, &$return, $current_version)
 		$question.= makeyesno('update_defdns_mailentry', '1', '0', '0');
 		eval("\$return.=\"" . getTemplate("update/preconfigitem") . "\";");
 	}
-	
+
 	if(versionInUpdate($current_version, '0.9.10-svn1'))
 	{
 		$has_nouser = false;
@@ -171,13 +171,13 @@ function parseAndOutputPreconfig(&$has_preconfig, &$return, $current_version)
 			$has_nouser = true;
 			$guessed_user = 'www-data';
 			if(function_exists('posix_getuid')
-				&& function_exists('posix_getpwuid')
+					&& function_exists('posix_getpwuid')
 			) {
 				$_httpuser = posix_getpwuid(posix_getuid());
 				$guessed_user = $_httpuser['name'];
 			}
 		}
-		
+
 		$result = $db->query_first("SELECT * FROM `" . TABLE_PANEL_SETTINGS . "` WHERE `settinggroup` = 'system' AND `varname` = 'httpgroup'");
 		if(!isset($result) || !isset($result['value']))
 		{
@@ -185,7 +185,7 @@ function parseAndOutputPreconfig(&$has_preconfig, &$return, $current_version)
 			$has_nogroup = true;
 			$guessed_group = 'www-data';
 			if(function_exists('posix_getgid')
-				&& function_exists('posix_getgrgid')
+					&& function_exists('posix_getgrgid')
 			) {
 				$_httpgroup = posix_getgrgid(posix_getgid());
 				$guessed_group = $_httpgroup['name'];
@@ -198,8 +198,8 @@ function parseAndOutputPreconfig(&$has_preconfig, &$return, $current_version)
 			if($has_nouser)
 			{
 				$question = '<strong>Please enter the webservers username:</strong>&nbsp;<input type="text" class="text" name="update_httpuser" value="'.$guessed_user.'" />';
-			} 
-			elseif($has_nogroup) 
+			}
+			elseif($has_nogroup)
 			{
 				$question2 = '<strong>Please enter the webservers groupname:</strong>&nbsp;<input type="text" class="text" name="update_httpgroup" value="'.$guessed_group.'" />';
 				if($has_nouser) {
@@ -238,7 +238,7 @@ function parseAndOutputPreconfig(&$has_preconfig, &$return, $current_version)
 		$question.= '<input type="text" class="text" name="update_perlpath" value="/usr/bin/perl" />';
 		eval("\$return.=\"" . getTemplate("update/preconfigitem") . "\";");
 	}
-	
+
 	if(versionInUpdate($current_version, '0.9.12-svn1'))
 	{
 		if($settings['system']['mod_fcgid'] == 1)
@@ -345,13 +345,13 @@ function parseAndOutputPreconfig(&$has_preconfig, &$return, $current_version)
 	}
 
 	if(versionInUpdate($current_version, '0.9.14-svn10'))
-	{       
+	{
 		$has_preconfig = true;
-		$description = '<strong>This update removes the unsupported real-time option. Additionally the deprecated tables for navigation and cronscripts are removed, any modules using these tables need to be updated to the new structure!</strong>'; 
+		$description = '<strong>This update removes the unsupported real-time option. Additionally the deprecated tables for navigation and cronscripts are removed, any modules using these tables need to be updated to the new structure!</strong>';
 		$question = '';
 		eval("\$return.=\"" . getTemplate("update/preconfigitem") . "\";");
 	}
-	
+
 	if(versionInUpdate($current_version, '0.9.16-svn1'))
 	{
 		$has_preconfig = true;
@@ -417,16 +417,120 @@ function parseAndOutputPreconfig(&$has_preconfig, &$return, $current_version)
 	}
 
 	if(versionInUpdate($current_version, '0.9.18-svn2'))
-	{       
+	{
 		$has_preconfig = true;
-		$description = 'As you can (obviously) see, Froxlor now comes with a new theme. You also have the possibility to switch back to "Classic" if you want to.'; 
+		$description = 'As you can (obviously) see, Froxlor now comes with a new theme. You also have the possibility to switch back to "Classic" if you want to.';
 		$question = '<strong>Select default panel theme:</strong>&nbsp;';
 		$question.= '<select name="update_default_theme">';
 		$themes = getThemes();
-		foreach($themes as $theme) {
-			$question.= makeoption($theme, $theme, 'Froxlor');
+		foreach($themes as $cur_theme) // $theme is already in use
+		{
+			$question.= makeoption($cur_theme, $cur_theme, 'Froxlor');
 		}
 		$question.= '</select>';
+		eval("\$return.=\"" . getTemplate("update/preconfigitem") . "\";");
+	}
+
+	if(versionInUpdate($current_version, '0.9.28-svn4'))
+	{
+		$has_preconfig = true;
+		$description = 'This version introduces a lot of profound changes:';
+		$description .= '<br /><ul><li>Improving the whole template system</li><li>Full UTF-8 support</li><li><strong>Removing support for the former default theme \'Classic\'</strong></li></ul>';
+		$description .= '<br /><br />Notice: This update will <strong>alter your Froxlor database to use UTF-8</strong> as default charset. ';
+		$description .= 'Even though this is already tested, we <span style="color:#ff0000;font-weight:bold;">strongly recommend</span> to ';
+		$description .= 'test this update in a testing environment using your existing data.<br /><br />';
+
+		$question = '<strong>Select your preferred Classic Theme replacement:</strong>&nbsp;';
+		$question.= '<select name="classic_theme_replacement">';
+		$themes = getThemes();
+		foreach($themes as $cur_theme)
+		{
+			$question.= makeoption($cur_theme, $cur_theme, 'Froxlor');
+		}
+		$question.= '</select>';
+
+		eval("\$return.=\"" . getTemplate("update/preconfigitem") . "\";");
+	}
+
+	if (versionInUpdate($current_version, '0.9.28-svn6')) {
+
+		if ($settings['system']['webserver'] == 'apache2') {
+			$has_preconfig = true;
+			$description = 'Froxlor now supports the new Apache 2.4. Please be aware that you need to load additional apache-modules in ordner to use it.<br />';
+			$description.= '<pre>LoadModule authz_core_module modules/mod_authz_core.so
+					LoadModule authz_host_module modules/mod_authz_host.so</pre><br />';
+			$question = '<strong>Do you want to enable the Apache-2.4 modification?:</strong>&nbsp;';
+			$question.= makeyesno('update_system_apache24', '1', '0', '0');
+			eval("\$return.=\"" . getTemplate("update/preconfigitem") . "\";");
+		} elseif ($settings['system']['webserver'] == 'nginx') {
+			$has_preconfig = true;
+			$description = 'The path to nginx\'s fastcgi_params file is now customizable.<br /><br />';
+			$question = '<strong>Please enter full path to you nginx/fastcgi_params file (including filename):</strong>&nbsp;';
+			$question.= '<input type="text" class="text" name="nginx_fastcgi_params" value="/etc/nginx/fastcgi_params" />';
+			eval("\$return.=\"" . getTemplate("update/preconfigitem") . "\";");
+		}
+	}
+
+	if (versionInUpdate($current_version, '0.9.28-rc2')) {
+
+		$has_preconfig = true;
+
+		$description  = 'This version adds an option to append the domain-name to the document-root for domains and subdomains.<br />';
+		$description .= 'You can enable or disable this feature anytime from settings -> system settings.<br />';
+
+		$question = '<strong>Do you want to automatically append the domain-name to the documentroot of newly created domains?:</strong>&nbsp;';
+		$question.= makeyesno('update_system_documentroot_use_default_value', '1', '0', '0');
+
+		eval("\$return.=\"" . getTemplate("update/preconfigitem") . "\";");
+	}
+
+	if (versionInUpdate($current_version, '0.9.28')) {
+
+		$has_preconfig = true;
+		// just an information about the new sendmail parameter (#1134)
+		$description  = 'Froxlor changed the default parameter-set of sendmail (php.ini)<br />';
+		$description .= 'sendmail_path = "/usr/sbin/sendmail -t <strong>-i</strong> -f {CUSTOMER_EMAIL}"<br /><br />';
+		$description .= 'If you don\'t have any problems with sending mails, you don\'t need to change this';
+		if ($settings['system']['mod_fcgid'] == '1'
+				|| $settings['phpfpm']['enabled'] == '1'
+		) {
+			// information about removal of php's safe_mode
+			$description .= '<br /><br />The php safe_mode flag has been removed as current versions of PHP<br />';
+			$description .= 'do not support it anymore.<br /><br />';
+			$description .= 'Please check your php-configurations and remove safe_mode-directives to avoid php notices/warnings.';
+		}
+		$question = '';
+
+		eval("\$return.=\"" . getTemplate("update/preconfigitem") . "\";");
+	}
+
+	if (versionInUpdate($current_version, '0.9.29-dev1')) {
+		// we only need to ask if fcgid|php-fpm is enabled
+		if ($settings['system']['mod_fcgid'] == '1'
+				|| $settings['phpfpm']['enabled'] == '1'
+		) {
+			$has_preconfig = true;
+			$description  = 'Standard-subdomains can now be hidden from the php-configuration overview.<br />';
+			$question = '<strong>Do you want to hide the standard-subdomains (this can be changed in the settings any time)?:</strong>&nbsp;';
+			$question.= makeyesno('hide_stdsubdomains', '1', '0', '0');
+			eval("\$return.=\"" . getTemplate("update/preconfigitem") . "\";");
+		}
+	}
+
+	if (versionInUpdate($current_version, '0.9.29-dev2')) {
+		$has_preconfig = true;
+		$description  = 'You can now decide whether admins/customers are able to change the theme<br />';
+		$question = '<strong>If you want to disallow theme-changing, select "no" from the dropdowns:</strong>&nbsp;';
+		$question.= "Admins: ". makeyesno('allow_themechange_a', '1', '0', '1').'&nbsp;&nbsp;';
+		$question.= "Customers: ".makeyesno('allow_themechange_c', '1', '0', '1');
+		eval("\$return.=\"" . getTemplate("update/preconfigitem") . "\";");
+	}
+
+	if (versionInUpdate($current_version, '0.9.29-dev3')) {
+		$has_preconfig = true;
+		$description  = 'There is now a possibility to specify AFXR servers for your bind zone-configuration<br />';
+		$question = '<strong>Enter a comma-separated list of AFXR servers or leave empty (default):</strong>&nbsp;';
+		$question.= '<input type="text" class="text" name="system_afxrservers" value="" />';
 		eval("\$return.=\"" . getTemplate("update/preconfigitem") . "\";");
 	}
 }

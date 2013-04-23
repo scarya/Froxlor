@@ -2,7 +2,7 @@ $header
 	<article>
 		<header>
 			<h2>
-				<img src="images/Froxlor/{$image}" alt="{$title}" />&nbsp;
+				<img src="templates/{$theme}/assets/img/{$image}" alt="{$title}" />&nbsp;
 				{$title}
 			</h2>
 		</header>
@@ -34,7 +34,7 @@ $header
 	<article>
 		<header>
 			<h2>
-				<img src="images/Froxlor/icons/replace_vars.png" alt="" />&nbsp;
+				<img src="templates/{$theme}/assets/img/icons/replace_vars.png" alt="" />&nbsp;
 				{$lng['admin']['templates']['template_replace_vars']}
 			</h2>
 		</header>
@@ -53,10 +53,6 @@ $header
 					<td colspan="2">
 						<strong>{$lng['admin']['phpconfig']['template_replace_vars']}</strong>
 					</td>
-				</tr>
-				<tr>
-					<td><em>{SAFE_MODE}</em></td>
-					<td>{$lng['admin']['phpconfig']['safe_mode']}</td>
 				</tr>
 				<tr>
 					<td><em>{PEAR_DIR}</em></td>

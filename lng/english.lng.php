@@ -70,7 +70,7 @@ $lng['customer']['forwarders'] = 'E-mail-Forwarders';
 $lng['customer']['ftps'] = 'FTP-Accounts';
 $lng['customer']['subdomains'] = 'Sub-Domain';
 $lng['customer']['domains'] = 'Domain';
-$lng['customer']['unlimited'] = '&infin;';
+$lng['customer']['unlimited'] = '∞';
 
 /**
  * Customermenue
@@ -191,7 +191,7 @@ $lng['error']['firstdeleteallsubdomains'] = 'You have to delete all subdomains f
 $lng['error']['youhavealreadyacatchallforthisdomain'] = 'You have already defined a catchall for this domain.';
 $lng['error']['ftp_cantdeletemainaccount'] = 'You cannot delete your main FTP account';
 $lng['error']['login'] = 'The username or password you typed in is wrong. Please try it again!';
-$lng['error']['login_blocked'] = 'This account has been suspended because of too many login errors. <br />Please try again in ' . $settings['login']['deactivatetime'] . ' seconds.';
+$lng['error']['login_blocked'] = 'This account has been suspended because of too many login errors. <br />Please try again in %s seconds.';
 $lng['error']['notallreqfieldsorerrors'] = 'You have not filled in all or filled in some fields incorrectly.';
 $lng['error']['oldpasswordnotcorrect'] = 'The old password is not correct.';
 $lng['error']['youcantallocatemorethanyouhave'] = 'You cannot allocate more resources than you own for yourself.';
@@ -199,15 +199,7 @@ $lng['error']['mustbeurl'] = 'You have not typed a valid or complete url (e.g. h
 $lng['error']['invalidpath'] = 'You have not chosen a valid URL (maybe problems with the dirlisting?)';
 $lng['error']['stringisempty'] = 'Missing Input in Field';
 $lng['error']['stringiswrong'] = 'Wrong Input in Field';
-$lng['error']['myloginname'] = '\'' . $lng['login']['username'] . '\'';
-$lng['error']['mypassword'] = '\'' . $lng['login']['password'] . '\'';
-$lng['error']['oldpassword'] = '\'' . $lng['changepassword']['old_password'] . '\'';
-$lng['error']['newpassword'] = '\'' . $lng['changepassword']['new_password'] . '\'';
-$lng['error']['newpasswordconfirm'] = '\'' . $lng['changepassword']['new_password_confirm'] . '\'';
 $lng['error']['newpasswordconfirmerror'] = 'New password and confirmation does not match';
-$lng['error']['myname'] = '\'' . $lng['customer']['name'] . '\'';
-$lng['error']['myfirstname'] = '\'' . $lng['customer']['firstname'] . '\'';
-$lng['error']['emailadd'] = '\'' . $lng['customer']['email'] . '\'';
 $lng['error']['mydomain'] = '\'Domain\'';
 $lng['error']['mydocumentroot'] = '\'Documentroot\'';
 $lng['error']['loginnameexists'] = 'Login-Name %s already exists';
@@ -234,7 +226,6 @@ $lng['error']['destinationnonexist'] = 'Please create your forwarder in the fiel
 $lng['error']['destinationalreadyexistasmail'] = 'The forwarder to %s already exists as active e-mail-address.';
 $lng['error']['destinationalreadyexist'] = 'You have already defined a forwarder to %s .';
 $lng['error']['destinationiswrong'] = 'The forwarder %s contains invalid character(s) or is incomplete.';
-$lng['error']['domainname'] = $lng['domains']['domainname'];
 $lng['error']['ticketnotaccessible'] = 'You cannot access this ticket.';
 
 /**
@@ -308,14 +299,14 @@ $lng['admin']['deactivated_user'] = 'Deactivate user';
 $lng['admin']['sendpassword'] = 'Send password';
 $lng['admin']['ownvhostsettings'] = 'Own vHost-settings';
 $lng['admin']['configfiles']['serverconfiguration'] = 'Configuration';
-$lng['admin']['configfiles']['files'] = '<b>Configfiles:</b> Please change the following files or create them with<br />the following content if they do not exist.<br /><b>Please note:</b> The MySQL-password has not been replaced for security reasons.<br />Please replace &quot;MYSQL_PASSWORD&quot; on your own. If you forgot your MySQL-password<br />you\'ll find it in &quot;lib/userdata.inc.php&quot;.';
+$lng['admin']['configfiles']['files'] = '<b>Configfiles:</b> Please change the following files or create them with<br />the following content if they do not exist.<br /><b>Please note:</b> The MySQL-password has not been replaced for security reasons.<br />Please replace "MYSQL_PASSWORD" on your own. If you forgot your MySQL-password<br />you\'ll find it in "lib/userdata.inc.php".';
 $lng['admin']['configfiles']['commands'] = '<b>Commands:</b> Please execute the following commands in a shell.';
 $lng['admin']['configfiles']['restart'] = '<b>Restart:</b> Please execute the following commands in a shell in order to reload the new configuration.';
 $lng['admin']['templates']['templates'] = 'E-Mail-templates';
 $lng['admin']['templates']['template_add'] = 'Add template';
 $lng['admin']['templates']['template_edit'] = 'Edit template';
 $lng['admin']['templates']['action'] = 'Action';
-$lng['admin']['templates']['email'] = 'E-mail &amp; file templates';
+$lng['admin']['templates']['email'] = 'E-mail & file templates';
 $lng['admin']['templates']['subject'] = 'Subject';
 $lng['admin']['templates']['mailbody'] = 'Mail body';
 $lng['admin']['templates']['createcustomer'] = 'Welcome mail for new customers';
@@ -339,7 +330,7 @@ $lng['serversettings']['session_timeout']['description'] = 'How long does a user
 $lng['serversettings']['accountprefix']['title'] = 'Customer prefix';
 $lng['serversettings']['accountprefix']['description'] = 'Which prefix should customer accounts have?';
 $lng['serversettings']['mysqlprefix']['title'] = 'SQL Prefix';
-$lng['serversettings']['mysqlprefix']['description'] = 'Which prefix should MySQL accounts have?';
+$lng['serversettings']['mysqlprefix']['description'] = 'Which prefix should MySQL accounts have?</br>Use "RANDOM" as vlaue to get a 3-digit random prefix';
 $lng['serversettings']['ftpprefix']['title'] = 'FTP Prefix';
 $lng['serversettings']['ftpprefix']['description'] = 'Which prefix should ftp accounts have?';
 $lng['serversettings']['documentroot_prefix']['title'] = 'Home directory';
@@ -426,21 +417,21 @@ $lng['domain']['openbasedirpath'] = 'OpenBasedir-path';
 $lng['domain']['docroot'] = 'Path from field above';
 $lng['domain']['homedir'] = 'Home directory';
 $lng['admin']['valuemandatory'] = 'This value is mandatory';
-$lng['admin']['valuemandatorycompany'] = 'Either &quot;name&quot; and &quot;firstname&quot; or &quot;company&quot; must be filled';
+$lng['admin']['valuemandatorycompany'] = 'Either "name" and "firstname" or "company" must be filled';
 $lng['menue']['main']['username'] = 'Logged in as: ';
 $lng['panel']['urloverridespath'] = 'URL (overrides path)';
 $lng['panel']['pathorurl'] = 'Path or URL';
-$lng['error']['sessiontimeoutiswrong'] = 'Only numerical &quot;session timeout&quot; is allowed.';
-$lng['error']['maxloginattemptsiswrong'] = 'Only numerical &quot;max login attempts&quot; are allowed.';
-$lng['error']['deactivatetimiswrong'] = 'Only numerical &quot;deactivation time&quot; is allowed.';
-$lng['error']['accountprefixiswrong'] = 'The &quot;customerprefix&quot; is wrong.';
-$lng['error']['mysqlprefixiswrong'] = 'The &quot;SQL prefix&quot; is wrong.';
-$lng['error']['ftpprefixiswrong'] = 'The &quot;FTP prefix&quot; is wrong.';
-$lng['error']['ipiswrong'] = 'The &quot;IP-address&quot; is wrong. Only a valid IP-address is allowed.';
-$lng['error']['vmailuidiswrong'] = 'The &quot;mails-uid&quot; is wrong. Only a numerical UID is allowed.';
-$lng['error']['vmailgidiswrong'] = 'The &quot;mails-gid&quot; is wrong. Only a numerical GID is allowed.';
-$lng['error']['adminmailiswrong'] = 'The &quot;sender-address&quot; is wrong. Only a valid email-address is allowed.';
-$lng['error']['pagingiswrong'] = 'The &quot;entries per page&quot;-value is wrong. Only numerical characters are allowed.';
+$lng['error']['sessiontimeoutiswrong'] = 'Only numerical "session timeout" is allowed.';
+$lng['error']['maxloginattemptsiswrong'] = 'Only numerical "max login attempts" are allowed.';
+$lng['error']['deactivatetimiswrong'] = 'Only numerical "deactivation time" is allowed.';
+$lng['error']['accountprefixiswrong'] = 'The "customerprefix" is wrong.';
+$lng['error']['mysqlprefixiswrong'] = 'The "SQL prefix" is wrong.';
+$lng['error']['ftpprefixiswrong'] = 'The "FTP prefix" is wrong.';
+$lng['error']['ipiswrong'] = 'The "IP-address" is wrong. Only a valid IP-address is allowed.';
+$lng['error']['vmailuidiswrong'] = 'The "mails-uid" is wrong. Only a numerical UID is allowed.';
+$lng['error']['vmailgidiswrong'] = 'The "mails-gid" is wrong. Only a numerical GID is allowed.';
+$lng['error']['adminmailiswrong'] = 'The "sender-address" is wrong. Only a valid email-address is allowed.';
+$lng['error']['pagingiswrong'] = 'The "entries per page"-value is wrong. Only numerical characters are allowed.';
 $lng['error']['phpmyadminiswrong'] = 'The phpMyAdmin-link is not a valid link.';
 $lng['error']['webmailiswrong'] = 'The webmail-link is not a valid link.';
 $lng['error']['webftpiswrong'] = 'The WebFTP-link is not a valid link.';
@@ -459,7 +450,7 @@ $lng['panel']['translator'] = 'Translator';
 
 // ADDED IN 1.2.14-rc4
 
-$lng['error']['stringformaterror'] = 'The value for the field &quot;%s&quot; is not in the expected format.';
+$lng['error']['stringformaterror'] = 'The value for the field "%s" is not in the expected format.';
 
 // ADDED IN 1.2.15-rc1
 
@@ -475,7 +466,7 @@ $lng['serversettings']['phpappendopenbasedir']['description'] = 'These paths (se
 
 // CHANGED IN 1.2.15-rc1
 
-$lng['error']['loginnameissystemaccount'] = 'You cannot create accounts which are similar to system accounts (as for example begin with &quot;%s&quot;). Please enter another account name.';
+$lng['error']['loginnameissystemaccount'] = 'You cannot create accounts which are similar to system accounts (as for example begin with "%s"). Please enter another account name.';
 $lng['error']['youcantdeleteyourself'] = 'You cannot delete yourself for security reasons.';
 $lng['error']['youcanteditallfieldsofyourself'] = 'Note: You cannot edit all fields of your own account for security reasons.';
 
@@ -514,7 +505,7 @@ $lng['admin']['subcanemaildomain']['never'] = 'Never';
 $lng['admin']['subcanemaildomain']['choosableno'] = 'Choosable, default no';
 $lng['admin']['subcanemaildomain']['choosableyes'] = 'Choosable, default yes';
 $lng['admin']['subcanemaildomain']['always'] = 'Always';
-$lng['changepassword']['also_change_webalizer'] = ' also change password of the webalizer statistics';
+$lng['changepassword']['also_change_webalizer'] = ' also change password for the statistics page';
 
 // ADDED IN 1.2.16-svn8
 
@@ -545,8 +536,6 @@ $lng['panel']['back'] = 'Back';
 
 // ADDED IN 1.2.16-svn12
 
-$lng['serversettings']['mod_log_sql']['title'] = 'Temporary save logs in the database';
-$lng['serversettings']['mod_log_sql']['description'] = 'Use <a target="blank" href="http://www.outoforder.cc/projects/apache/mod_log_sql/" title="mod_log_sql">mod_log_sql</a> to save webrequests temporarily<br /><b>This needs a special <a target="blank" href="http://files.froxlor.org/docs/mod_log_sql/" title="mod_log_sql - documentation">apache-configuration</a>!</b>';
 $lng['serversettings']['mod_fcgid']['title'] = 'Enable FCGID';
 $lng['serversettings']['mod_fcgid']['description'] = 'Use this to run PHP with the corresponding useraccount.<br /><br /><b>This needs a special webserver configuration for Apache, see <a target="blank" href="http://redmine.froxlor.org/projects/froxlor/wiki/FCGID_-_handbook">FCGI - handbook</a></b>';
 $lng['serversettings']['sendalternativemail']['title'] = 'Use alternative email-address';
@@ -559,7 +548,7 @@ $lng['admin']['templates']['EMAIL_PASSWORD'] = 'Replaced with the POP3/IMAP acco
 
 // ADDED IN 1.2.16-svn13
 
-$lng['error']['documentrootexists'] = 'The directory &quot;%s&quot; already exists for this customer. Please remove this before adding the customer again.';
+$lng['error']['documentrootexists'] = 'The directory "%s" already exists for this customer. Please remove this before adding the customer again.';
 
 // ADDED IN 1.2.16-svn14
 
@@ -667,13 +656,9 @@ $lng['question']['ticket_reallyclose'] = 'Do you really want to close the ticket
 $lng['question']['ticket_reallydelete'] = 'Do you really want to delete the ticket "%s"?';
 $lng['question']['ticket_reallydeletecat'] = 'Do you really want to delete the category "%s"?';
 $lng['question']['ticket_reallyarchive'] = 'Do you really want to move the ticket "%s" to the archive?';
-$lng['error']['mysubject'] = '\'' . $lng['ticket']['subject'] . '\'';
-$lng['error']['mymessage'] = '\'' . $lng['ticket']['message'] . '\'';
-$lng['error']['mycategory'] = '\'' . $lng['ticket']['category'] . '\'';
 $lng['error']['nomoreticketsavailable'] = 'You have used all your available tickets. Please contact your administrator.';
 $lng['error']['nocustomerforticket'] = 'Cannot create tickets without customers';
 $lng['error']['categoryhastickets'] = 'The category still has tickets in it.<br />Please delete the tickets to delete the category';
-$lng['error']['notmorethanxopentickets'] = $lng['ticket']['notmorethanxopentickets'];
 $lng['admin']['ticketsettings'] = 'Support-Ticket settings';
 $lng['admin']['archivelastrun'] = 'Last ticket archiving';
 $lng['serversettings']['ticket']['noreply_email']['title'] = 'No-reply e-mail address';
@@ -694,8 +679,8 @@ $lng['customer']['tickets'] = 'Support-tickets';
 $lng['admin']['domain_nocustomeraddingavailable'] = 'It\'s not possible to add a domain currently. You first need to add at least one customer.';
 $lng['serversettings']['ticket']['enable'] = 'Enable ticketsystem';
 $lng['serversettings']['ticket']['concurrentlyopen'] = 'How many tickets shall be able to be opened at one time?';
-$lng['error']['norepymailiswrong'] = 'The &quot;Noreply-address&quot; is wrong. Only a valid email-address is allowed.';
-$lng['error']['tadminmailiswrong'] = 'The &quot;Ticketadmin-address&quot; is wrong. Only a valid email-address is allowed.';
+$lng['error']['norepymailiswrong'] = 'The "Noreply-address" is wrong. Only a valid email-address is allowed.';
+$lng['error']['tadminmailiswrong'] = 'The "Ticketadmin-address" is wrong. Only a valid email-address is allowed.';
 $lng['ticket']['awaitingticketreply'] = 'You have %s unanswered support-ticket(s)';
 
 // ADDED IN 1.2.18-svn5
@@ -758,7 +743,7 @@ $lng['serversettings']['logger']['types']['description'] = 'Specify logtypes. To
 $lng['serversettings']['logger']['logfile'] = 'Logfile path including filename';
 $lng['error']['logerror'] = 'Log-Error: %s';
 $lng['serversettings']['logger']['logcron'] = 'Log cronjobs (one run)';
-$lng['question']['logger_reallytruncate'] = 'Do you really want to truncate the table &quot;%s&quot;?';
+$lng['question']['logger_reallytruncate'] = 'Do you really want to truncate the table "%s"?';
 $lng['admin']['loggersystem'] = 'System-logging';
 $lng['menue']['logger']['logger'] = 'System-logging';
 $lng['logger']['date'] = 'Date';
@@ -779,7 +764,7 @@ $lng['error']['nomessagetosend'] = 'You did not enter a message.';
 $lng['error']['noreceipientsgiven'] = 'You did not specify any receipient';
 $lng['admin']['emaildomain'] = 'Emaildomain';
 $lng['admin']['email_only'] = 'Only email?';
-$lng['admin']['wwwserveralias'] = 'Add a &quot;www.&quot; ServerAlias';
+$lng['admin']['wwwserveralias'] = 'Add a "www." ServerAlias';
 $lng['admin']['ipsandports']['enable_ssl'] = 'Is this an SSL Port?';
 $lng['admin']['ipsandports']['ssl_cert_file'] = 'Path to the SSL Certificate';
 $lng['panel']['send'] = 'send';
@@ -788,13 +773,12 @@ $lng['admin']['receipient'] = 'Recipient';
 $lng['admin']['message'] = 'Write a Message';
 $lng['admin']['text'] = 'Message';
 $lng['menu']['message'] = 'Messages';
-$lng['error']['errorsendingmail'] = 'The message to &quot;%s&quot; failed';
-$lng['error']['cannotreaddir'] = 'Unable to read directory &quot;%s&quot;';
+$lng['error']['errorsendingmail'] = 'The message to "%s" failed';
+$lng['error']['cannotreaddir'] = 'Unable to read directory "%s"';
 $lng['message']['success'] = 'Successfully sent message to %s recipients';
 $lng['message']['noreceipients'] = 'No e-mail has been sent because there are no recipients in the database';
 $lng['admin']['sslsettings'] = 'SSL settings';
 $lng['cronjobs']['notyetrun'] = 'Not yet run';
-$lng['install']['servername_should_be_fqdn'] = 'The servername should be a FQDN and not an IP address';
 $lng['serversettings']['default_vhostconf']['title'] = 'Default vHost-settings';
 $lng['serversettings']['default_vhostconf']['description'] = 'The content of this field will be included into the domain vHost container directly. Attention: The code won\'t be checked for any errors. If it contains errors, webserver might not start again!';
 $lng['error']['invalidip'] = 'Invalid IP address: %s';
@@ -923,7 +907,7 @@ $lng['customer']['mail_quota'] = 'Mailquota';
 $lng['panel']['megabyte'] = 'MegaByte';
 $lng['panel']['not_supported'] = 'Not supported in: ';
 $lng['emails']['quota_edit'] = 'Change E-Mail Quota';
-$lng['error']['allocatetoomuchquota'] = 'You tried to allocate %s MB ' . $lng['emails']['quota'] . ', but you do not have enough left.';
+$lng['error']['allocatetoomuchquota'] = 'You tried to allocate %s MB Quota, but you do not have enough left.';
 
 // Autoresponder module
 
@@ -974,7 +958,6 @@ $lng['error']['phpsettingidwrong'] = 'A PHP Configuration with this id doesn\'t 
 $lng['error']['descriptioninvalid'] = 'The description is too short, too long or contains illegal characters.';
 $lng['error']['info'] = 'Info';
 $lng['admin']['phpconfig']['template_replace_vars'] = 'Variables that will be replaced in the configs';
-$lng['admin']['phpconfig']['safe_mode'] = 'Will be replaced with the safe_mode setting of the domain.';
 $lng['admin']['phpconfig']['pear_dir'] = 'Will be replaced with the global setting for the pear directory.';
 $lng['admin']['phpconfig']['open_basedir_c'] = 'Will insert a ; (semicolon) to comment-out/disable open_basedir when set';
 $lng['admin']['phpconfig']['open_basedir'] = 'Will be replaced with the open_basedir setting of the domain.';
@@ -1129,7 +1112,7 @@ $lng['question']['reallywanttoremove'] = '<strong>Do you really want to uninstal
 $lng['aps']['searchoneresult'] = '%s package found';
 $lng['aps']['searchmultiresult'] = '%s packages found';
 $lng['question']['reallywanttostop'] = 'Do you really want to abort the installation of this package?<br/><br/>';
-$lng['aps']['packagenameandversion'] = 'Packagename &amp; version';
+$lng['aps']['packagenameandversion'] = 'Packagename & version';
 $lng['aps']['package_locked'] = 'Locked';
 $lng['aps']['package_enabled'] = 'Enabled';
 $lng['aps']['lock'] = 'Lock';
@@ -1138,7 +1121,7 @@ $lng['aps']['remove'] = 'Remove';
 $lng['aps']['allpackages'] = 'All packages';
 $lng['question']['reallyremovepackages'] = '<strong>Do you really want to delete these packages?</strong><br/><br/>Packages with dependencies can only be remove if the corresponding Instances have been removed!<br/><br/>';
 $lng['aps']['nopackagesinsystem'] = 'There were no packages installed in the system which could be managed.';
-$lng['aps']['packagenameandstatus'] = 'Packagename &amp; status';
+$lng['aps']['packagenameandstatus'] = 'Packagename & status';
 $lng['aps']['activate_aps']['title'] = 'Enable APS installer';
 $lng['aps']['activate_aps']['description'] = 'Here the APS installer can be enabled and disabled globaly.';
 $lng['aps']['packages_per_page']['title'] = 'Packages per page';
@@ -1279,7 +1262,7 @@ $lng['admin']['newerversionavailable'] = 'There is a newer version of Froxlor av
 // ADDED IN FROXLOR 0.9.3
 
 $lng['emails']['noemaildomainaddedyet'] = 'You do not have a (email-)domain in your account yet.';
-$lng['error']['hiddenfieldvaluechanged'] = 'The value for the hidden field &quot;%s&quot; changed while editing the settings.<br /><br />This is usually not a big problem but the settings could not be saved because of this.';
+$lng['error']['hiddenfieldvaluechanged'] = 'The value for the hidden field "%s" changed while editing the settings.<br /><br />This is usually not a big problem but the settings could not be saved because of this.';
 
 // ADDED IN FROXLOR 0.9.3-svn1
 
@@ -1300,7 +1283,7 @@ $lng['dkim']['dkim_algorithm']['title'] = 'Allowed Hash Algorithms';
 $lng['dkim']['dkim_algorithm']['description'] = 'Define allowed hash algorithms, chose "All" for all algorithms or one or more from the other available algorithms';
 $lng['dkim']['dkim_servicetype'] = 'Service Types';
 $lng['dkim']['dkim_keylength']['title'] = 'Key-length';
-$lng['dkim']['dkim_keylength']['description'] = 'Attention: If you change this values, you need to delete all the private/public keys in "'.$settings['dkim']['dkim_prefix'].'"';
+$lng['dkim']['dkim_keylength']['description'] = 'Attention: If you change this values, you need to delete all the private/public keys in "%s"';
 $lng['dkim']['dkim_notes']['title'] = 'DKIM Notes';
 $lng['dkim']['dkim_notes']['description'] = 'Notes that might be of interest to a human, e.g. a URL like http://www.dnswatch.info. No interpretation is made by any program. This tag should be used sparingly due to space limitations in DNS. This is intended for use by administrators, not end users.';
 $lng['dkim']['dkim_add_adsp']['title'] = 'Add DKIM ADSP entry';
@@ -1363,12 +1346,12 @@ $lng['ticket']['orderdesc'] = 'Here you can define your own logical order for th
 // ADDED IN FROXLOR 0.9.6-svn3
 $lng['serversettings']['defaultwebsrverrhandler_enabled'] = 'Enable default errordocuments for all customers';
 $lng['serversettings']['defaultwebsrverrhandler_err401']['title'] = 'File/URL for error 401';
-$lng['serversettings']['defaultwebsrverrhandler_err401']['description'] = '<div style="color:red">'.$lng['panel']['not_supported'].'lighttpd</div>';
+$lng['serversettings']['defaultwebsrverrhandler_err401']['description'] = '<div style="color:red">Not supported in: lighttpd</div>';
 $lng['serversettings']['defaultwebsrverrhandler_err403']['title'] = 'File/URL for error 403';
-$lng['serversettings']['defaultwebsrverrhandler_err403']['description'] = '<div style="color:red">'.$lng['panel']['not_supported'].'lighttpd</div>';
+$lng['serversettings']['defaultwebsrverrhandler_err403']['description'] = '<div style="color:red">Not supported in: lighttpd</div>';
 $lng['serversettings']['defaultwebsrverrhandler_err404'] = 'File/URL for error 404';
 $lng['serversettings']['defaultwebsrverrhandler_err500']['title'] = 'File/URL for error 500';
-$lng['serversettings']['defaultwebsrverrhandler_err500']['description'] = '<div style="color:red">'.$lng['panel']['not_supported'].'lighttpd</div>';
+$lng['serversettings']['defaultwebsrverrhandler_err500']['description'] = '<div style="color:red">Not supported in: lighttpd</div>';
 
 // ADDED IN FROXLOR 0.9.6-svn4
 $lng['serversettings']['ticket']['default_priority'] = 'Default support-ticket priority';
@@ -1517,9 +1500,9 @@ $lng['question']['customer_reallyunlock'] = 'Do you really want to unlock custom
 $lng['serversettings']['perl_server']['title'] = 'Perl server location';
 $lng['serversettings']['perl_server']['description'] = 'Default is set for using the guide found at: <a target="blank" href="http://wiki.nginx.org/SimpleCGI">http://wiki.nginx.org/SimpleCGI</a>';
 $lng['serversettings']['nginx_php_backend']['title'] = 'Nginx PHP backend';
-$lng['serversettings']['nginx_php_backend']['description'] = 'this is where the PHP process is listening for requests from nginx, can be a unix socket of ip:port combination';
+$lng['serversettings']['nginx_php_backend']['description'] = 'this is where the PHP process is listening for requests from nginx, can be a unix socket of ip:port combination<br />*NOT used with php-fpm';
 $lng['serversettings']['phpreload_command']['title'] = 'PHP reload command';
-$lng['serversettings']['phpreload_command']['description'] = 'this is used to reload the PHP backend if any is used<br />Default: blank';
+$lng['serversettings']['phpreload_command']['description'] = 'this is used to reload the PHP backend if any is used<br />Default: blank<br />*NOT used with php-fpm';
 
 // ADDED IN FROXLOR 0.9.16
 $lng['error']['intvaluetoolow'] = 'The given number is too low (field %s)';
@@ -1531,13 +1514,13 @@ $lng['serversettings']['phpfpm_settings']['aliasconfigdir'] = 'Configuration Ali
 $lng['serversettings']['phpfpm_settings']['reload'] = 'php-fpm restart command';
 $lng['serversettings']['phpfpm_settings']['pm'] = 'Process manager control (pm)';
 $lng['serversettings']['phpfpm_settings']['max_children']['title'] = 'The number of child processes';
-$lng['serversettings']['phpfpm_settings']['max_children']['description'] = 'The number of child processes to be created when pm is set to \'static\' and the maximum number of child processes to be created when pm is set to \'dynamic\'<br />Equivalent to the PHP_FCGI_CHILDREN';
+$lng['serversettings']['phpfpm_settings']['max_children']['description'] = 'The number of child processes to be created when pm is set to \'static\' and the maximum number of child processes to be created when pm is set to \'dynamic/ondemand\'<br />Equivalent to the PHP_FCGI_CHILDREN';
 $lng['serversettings']['phpfpm_settings']['start_servers']['title'] = 'The number of child processes created on startup';
-$lng['serversettings']['phpfpm_settings']['start_servers']['description'] = 'Note: Used only when pm is set to \'dynamic\'';
+$lng['serversettings']['phpfpm_settings']['start_servers']['description'] = 'Note: Used only when pm is set to \'dynamic/ondemand\'';
 $lng['serversettings']['phpfpm_settings']['min_spare_servers']['title'] = 'The desired minimum number of idle server processes';
-$lng['serversettings']['phpfpm_settings']['min_spare_servers']['description'] = 'Note: Used only when pm is set to \'dynamic\'<br />Note: Mandatory when pm is set to \'dynamic\'';
+$lng['serversettings']['phpfpm_settings']['min_spare_servers']['description'] = 'Note: Used only when pm is set to \'dynamic/ondemand\'<br />Note: Mandatory when pm is set to \'dynamic/ondemand\'';
 $lng['serversettings']['phpfpm_settings']['max_spare_servers']['title'] = 'The desired maximum number of idle server processes';
-$lng['serversettings']['phpfpm_settings']['max_spare_servers']['description'] = 'Note: Used only when pm is set to \'dynamic\'<br />Note: Mandatory when pm is set to \'dynamic\'';
+$lng['serversettings']['phpfpm_settings']['max_spare_servers']['description'] = 'Note: Used only when pm is set to \'dynamic/ondemand\'<br />Note: Mandatory when pm is set to \'dynamic/ondemand\'';
 $lng['serversettings']['phpfpm_settings']['max_requests']['title'] = 'Requests per child before respawning';
 $lng['serversettings']['phpfpm_settings']['max_requests']['description'] = 'For endless request processing specify \'0\'. Equivalent to PHP_FCGI_MAX_REQUESTS.';
 $lng['error']['phpfpmstillenabled'] = 'PHP-FPM is currently active. Please deactivate it before activating FCGID';
@@ -1607,7 +1590,7 @@ $lng['error']['admin_domain_emailsystemhostname'] = 'Sorry, the system - hostnam
 $lng['backup'] = 'Backup';
 $lng['backup_allowed'] = 'Backup allowed';
 $lng['extras']['backup_create'] = 'Create Backup?';
-$lng['extras']['backup_info'] = 'Backup will be saved once daily to a FTP directory. The FTP username is "&lt;Froxloruser&gt;_backup". The FTP password is the same as for your main FTP account.';
+$lng['extras']['backup_info'] = 'Backup will be saved once daily to a FTP directory. The FTP username is "<Froxloruser>_backup". The FTP password is the same as for your main FTP account.';
 $lng['extras']['backup_info_sep'] = 'It contains compressed archives of your web-directory and databases.';
 $lng['extras']['backup_info_big'] = 'It contains a compressed archive of your web-directory and databases.';
 $lng['extras']['backup_count_info'] = '<br /><br />Please note that the backup will charge your webspace!';
@@ -1915,9 +1898,47 @@ $lng['serversettings']['phpfpm_settings']['idle_timeout']['description'] = 'Time
 // ADDED IN 0.9.27-svn2
 $lng['panel']['cancel'] = 'Cancel';
 $lng['admin']['delete_statistics'] = 'Delete Statistics';
-$lng['admin']['speciallogwarning'] = 'WARNING: By changing this setting you will lose all your old statistics for this domain. If you are 100% sure you wish to change this type "'.$lng['admin']['delete_statistics'].'" in the field below and click the "'.$lng['panel']['delete'].'" button.<br /><br />';
+$lng['admin']['speciallogwarning'] = 'WARNING: By changing this setting you will lose all your old statistics for this domain. If you are sure you wish to change this type "%s" in the field below and click the "delete" button.<br /><br />';
 
 // ADDED IN 0.9.28-svn2
 $lng['serversettings']['vmail_maildirname']['title'] = 'Maildir name';
 $lng['serversettings']['vmail_maildirname']['description'] = 'Maildir directory into user\'s account. Normally \'Maildir\', in some implementations \'.maildir\', and directly into user\'s directory if left blank.';
 $lng['tasks']['remove_emailacc_files'] = 'Delete customer e-mail data.';
+
+// ADDED IN 0.9.28-svn5
+$lng['error']['operationnotpermitted'] = 'Operation not permitted!';
+$lng['error']['featureisdisabled'] = 'Feature %s is disabled. Please contact your service provider.';
+$lng['serversettings']['catchall_enabled']['title']  = 'Use Catchall';
+$lng['serversettings']['catchall_enabled']['description']  = 'Do you want to provide your customers the catchall-feature?';
+
+// ADDED IN 0.9.28.svn6
+$lng['serversettings']['apache_24'] = 'Use modifications for Apache 2.4';
+$lng['admin']['tickets_see_all'] = 'Can see all ticket-categories?';
+$lng['serversettings']['nginx_fastcgiparams']['title'] = 'Path to fastcgi_params file';
+$lng['serversettings']['nginx_fastcgiparams']['description'] = 'Specify the path to nginx\'s fastcgi_params file including filename';
+$lng['serversettings']['enablewebfonts']['title'] = 'Enable usage of a google webfont for the panel';
+$lng['serversettings']['enablewebfonts']['description'] = 'If enabled, the defined webfont is being used for the font-display';
+$lng['serversettings']['definewebfont']['title'] = 'Define a <a href="http://www.google.com/webfonts" rel="external">google-webfont</a> for the panel';
+$lng['serversettings']['definewebfont']['description'] = 'If enabled, this wefont will be used for the font-display.<br />Note: replace spaces with the "+" sign, e.g. "Open+Sans"';
+
+// Added in Froxlor 0.9.28-rc2
+$lng['serversettings']['documentroot_use_default_value']['title'] = 'Use domain name as default value for DocumentRoot path';
+$lng['serversettings']['documentroot_use_default_value']['description'] = 'If enabled and DocumentRoot path is empty, default value will be the (sub)domain name.<br /><br />Examples: <br />/var/customers/customer_name/example.com/<br />/var/customers/customer_name/subdomain.example.com/';
+
+$lng['error']['usercurrentlydeactivated'] = 'The user %s is currently deactivated';
+$lng['admin']['speciallogfile']['title'] = 'Separate logfile';
+$lng['admin']['speciallogfile']['description'] = 'Enable this to get a separate access-log file for this domain';
+$lng['error']['setlessthanalreadyused'] = 'You cannot set less resources of \'%s\' than this user already used';
+$lng['error']['stringmustntbeempty'] = 'The value for the field %s must not be empty';
+$lng['admin']['domain_editable']['title'] = 'Allow editing of domain';
+$lng['admin']['domain_editable']['desc'] = 'If set to yes, the customer is allowed to change several domain-settings.<br />If set to no, nothing can be changed by the customer.';
+
+// Added in Froxlor 0.9.29-dev
+$lng['serversettings']['panel_phpconfigs_hidestdsubdomain']['title'] = 'Hide standard-subdomains in PHP-configuration overview';
+$lng['serversettings']['panel_phpconfigs_hidestdsubdomain']['description'] = 'If activated the standard-subdomains for customers will not be displayed in the php-configurations overview<br /><br />Note: This is only visible if you have enabled FCGID or PHP-FPM';
+$lng['serversettings']['passwordcryptfunc']['title'] = 'Chose which password-crypt method is to be used';
+$lng['serversettings']['systemdefault'] = 'System default';
+$lng['serversettings']['panel_allow_theme_change_admin'] = 'Allow admins to change the theme';
+$lng['serversettings']['panel_allow_theme_change_customer'] = 'Allow customers to change the theme';
+$lng['serversettings']['axfrservers']['title'] = 'AXFR servers';
+$lng['serversettings']['axfrservers']['description'] = 'A comma separated list of IP addresses allowed to transfer (AXFR) dns zones.';

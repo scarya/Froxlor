@@ -48,48 +48,18 @@ if($page == 'customers'
 			'c.loginname' => $lng['login']['username'],
 			'a.loginname' => $lng['admin']['admin'],
 			'c.name' => $lng['customer']['name'],
+			'c.email' => $lng['customer']['email'],
 			'c.firstname' => $lng['customer']['firstname'],
 			'c.company' => $lng['customer']['company'],
 			'c.diskspace' => $lng['customer']['diskspace'],
 			'c.diskspace_used' => $lng['customer']['diskspace'] . ' (' . $lng['panel']['used'] . ')',
 			'c.traffic' => $lng['customer']['traffic'],
-			'c.traffic_used' => $lng['customer']['traffic'] . ' (' . $lng['panel']['used'] . ')',
-			'c.backup_allowed' => $lng['backup_allowed']
-/*
-			'c.mysqls' => $lng['customer']['mysqls'],
-			'c.mysqls_used' => $lng['customer']['mysqls'] . ' (' . $lng['panel']['used'] . ')',
-			'c.ftps' => $lng['customer']['ftps'],
-			'c.ftps_used' => $lng['customer']['ftps'] . ' (' . $lng['panel']['used'] . ')',
-			'c.subdomains' => $lng['customer']['subdomains'],
-			'c.subdomains_used' => $lng['customer']['subdomains'] . ' (' . $lng['panel']['used'] . ')',
-			'c.emails' => $lng['customer']['emails'],
-			'c.emails_used' => $lng['customer']['emails'] . ' (' . $lng['panel']['used'] . ')',
-			'c.email_accounts' => $lng['customer']['accounts'],
-			'c.email_accounts_used' => $lng['customer']['accounts'] . ' (' . $lng['panel']['used'] . ')',
-			'c.email_forwarders' => $lng['customer']['forwarders'],
-			'c.email_forwarders_used' => $lng['customer']['forwarders'] . ' (' . $lng['panel']['used'] . ')',
-			'c.email_quota' => $lng['customer']['email_quota'],
-			'c.email_quota_used' => $lng['customer']['email_quota'] . ' (' . $lng['panel']['used'] . ')',
-			'c.deactivated' => $lng['admin']['deactivated'],
-			'c.lastlogin_succ' => $lng['admin']['lastlogin_succ'],
-			'c.phpenabled' => $lng['admin']['phpenabled'],
-			'c.perlenabled' => $lng['admin']['perlenabled']
-*/
+			'c.traffic_used' => $lng['customer']['traffic'] . ' (' . $lng['panel']['used'] . ')'
 		);
 
-/*
-		if($settings['ticket']['enabled'] == 1)
-		{
-			$fields['c.tickets'] = $lng['customer']['tickets'];
-			$fields['c.tickets_used'] = $lng['customer']['tickets'] . ' (' . $lng['panel']['used'] . ')';
+		if ($settings['system']['backup_enabled'] == '1') {
+			$field['c.backup_allowed'] = $lng['backup_allowed'];
 		}
-
-		if($settings['autoresponder']['autoresponder_active'] == 1)
-		{
-			$fields['c.email_autoresponder'] = $lng['customer']['autoresponder'];
-			$fields['c.email_autoresponder_used'] = $lng['customer']['autoresponder'] . ' (' . $lng['panel']['used'] . ')';
-		}
-*/
 
 		$paging = new paging($userinfo, $db, TABLE_PANEL_CUSTOMERS, $fields, $settings['panel']['paging'], $settings['panel']['natsorting']);
 		$customers = '';
@@ -163,11 +133,14 @@ if($page == 'customers'
 
 		if($destination_user != '')
 		{
+			if ($result['deactivated'] == '1') {
+				standard_error("usercurrentlydeactivated", $destination_user);
+			}
 			$result = $db->query_first("SELECT * FROM `" . TABLE_PANEL_SESSIONS . "` WHERE `userid`='" . (int)$userinfo['userid'] . "' AND `hash`='" . $db->escape($s) . "'");
 			$s = md5(uniqid(microtime(), 1));
 			$db->query("INSERT INTO `" . TABLE_PANEL_SESSIONS . "` (`hash`, `userid`, `ipaddress`, `useragent`, `lastactivity`, `language`, `adminsession`) VALUES ('" . $db->escape($s) . "', '" . (int)$id . "', '" . $db->escape($result['ipaddress']) . "', '" . $db->escape($result['useragent']) . "', '" . time() . "', '" . $db->escape($result['language']) . "', '0')");
 			$log->logAction(ADM_ACTION, LOG_INFO, "switched user and is now '" . $destination_user . "'");
-			redirectTo('customer_index.php', Array('s' => $s));
+			redirectTo('customer_index.php', Array('s' => $s), true);
 		}
 		else
 		{
@@ -223,12 +196,17 @@ if($page == 'customers'
 						$last_dbserver = $row_database['dbserver'];
 					}
 
-					foreach(array_unique(explode(',', $settings['system']['mysql_access_host'])) as $mysql_access_host)
+					if(mysql_get_server_info() < '5.0.2') {
+						// failsafe if user has been deleted manually (requires MySQL 4.1.2+)
+						$db_root->query('REVOKE ALL PRIVILEGES, GRANT OPTION FROM \'' . $db_root->escape($row_database['databasename']) .'\'',false,true);
+					}
+
+					$host_res = $db_root->query("SELECT `Host` FROM `mysql`.`user` WHERE `User`='" . $db_root->escape($row_database['databasename']) . "'");
+					while($host = $db_root->fetch_array($host_res))
 					{
-						$mysql_access_host = trim($mysql_access_host);
-						$db_root->query('REVOKE ALL PRIVILEGES ON * . * FROM `' . $db_root->escape($row_database['databasename']) . '`@`' . $db_root->escape($mysql_access_host) . '`',false,true);
-						$db_root->query('REVOKE ALL PRIVILEGES ON `' . str_replace('_', '\_', $db_root->escape($row_database['databasename'])) . '` . * FROM `' . $db_root->escape($row_database['databasename']) . '`@`' . $db_root->escape($mysql_access_host) . '`',false,true);
-						$db_root->query('DELETE FROM `mysql`.`user` WHERE `User` = "' . $db_root->escape($row_database['databasename']) . '" AND `Host` = "' . $db_root->escape($mysql_access_host) . '"');
+						// as of MySQL 5.0.2 this also revokes privileges. (requires MySQL 4.1.2+)
+						$db_root->query('DROP USER \'' . $db_root->escape($row_database['databasename']). '\'@\'' . $db_root->escape($host['Host']) . '\'', false, true);
+						
 					}
 
 					$db_root->query('DROP DATABASE IF EXISTS `' . $db_root->escape($row_database['databasename']) . '`');
@@ -304,7 +282,7 @@ if($page == 'customers'
 
 				if($result['email_autoresponder'] != '-1')
 				{
-					$admin_update_query.= ", `email_autoresponder` = `email_autoresponder` - 0" . (int)$result['email_autoresponder'];
+					$admin_update_query.= ", `email_autoresponder_used` = `email_autoresponder_used` - 0" . (int)$result['email_autoresponder'];
 				}
 
 				if($result['subdomains'] != '-1')
@@ -324,7 +302,7 @@ if($page == 'customers'
 
 				if($result['aps_packages'] != '-1')
 				{
-					$admin_update_query.= ", `aps_packages` = `aps_packages` - 0" . (int)$result['aps_packages'];
+					$admin_update_query.= ", `aps_packages_used` = `aps_packages_used` - 0" . (int)$result['aps_packages'];
 				}
 
 				if(($result['diskspace'] / 1024) != '-1')
@@ -337,23 +315,17 @@ if($page == 'customers'
 				$log->logAction(ADM_ACTION, LOG_INFO, "deleted user '" . $result['loginname'] . "'");
 				inserttask('1');
 
-				# Using nameserver, insert a task which rebuilds the server config
-				if ($settings['system']['bind_enable'])
-				{
-					inserttask('4');
-				}
+				// Using nameserver, insert a task which rebuilds the server config
+				inserttask('4');
 
-				if(isset($_POST['delete_userfiles'])
-				  && (int)$_POST['delete_userfiles'] == 1)
-				{
+				if (isset($_POST['delete_userfiles'])
+						&& (int)$_POST['delete_userfiles'] == 1
+				) {
 					inserttask('6', $result['loginname']);
 				}
 
-				# Using filesystem - quota, insert a task which cleans the filesystem - quota
-				if ($settings['system']['diskquota_enabled'])
-				{
-					inserttask('10');
-				}
+				// Using filesystem - quota, insert a task which cleans the filesystem - quota
+				inserttask('10');
 
 				/*
 				 * move old tickets to archive
@@ -791,13 +763,10 @@ if($page == 'customers'
 					$log->logAction(ADM_ACTION, LOG_INFO, "added user '" . $loginname . "'");
 					inserttask('2', $loginname, $guid, $guid, $store_defaultindex);
 
-					# Using filesystem - quota, insert a task which cleans the filesystem - quota
-					if ($settings['system']['diskquota_enabled'])
-					{
-						inserttask('10');
-					}
-					// Add htpasswd for the webalizer stats
+					// Using filesystem - quota, insert a task which cleans the filesystem - quota
+					inserttask('10');
 
+					// Add htpasswd for the webalizer stats
 					if(CRYPT_STD_DES == 1)
 					{
 						$saltfordescrypt = substr(md5(uniqid(microtime(), 1)), 4, 2);
@@ -820,7 +789,8 @@ if($page == 'customers'
 					}
 
 					inserttask('1');
-					$result = $db->query("INSERT INTO `" . TABLE_FTP_USERS . "` " . "(`customerid`, `username`, `password`, `homedir`, `login_enabled`, `uid`, `gid`) " . "VALUES ('" . (int)$customerid . "', '" . $db->escape($loginname) . "', ENCRYPT('" . $db->escape($password) . "'), '" . $db->escape($documentroot) . "', 'y', '" . (int)$guid . "', '" . (int)$guid . "')");
+					$cryptPassword = makeCryptPassword($password);
+					$result = $db->query("INSERT INTO `" . TABLE_FTP_USERS . "` " . "(`customerid`, `username`, `password`, `homedir`, `login_enabled`, `uid`, `gid`) " . "VALUES ('" . (int)$customerid . "', '" . $db->escape($loginname) . "', '" . $db->escape($cryptPassword) . "', '" . $db->escape($documentroot) . "', 'y', '" . (int)$guid . "', '" . (int)$guid . "')");
 					$result = $db->query("INSERT INTO `" . TABLE_FTP_GROUPS . "` " . "(`customerid`, `groupname`, `gid`, `members`) " . "VALUES ('" . (int)$customerid . "', '" . $db->escape($loginname) . "', '" . $db->escape($guid) . "', '" . $db->escape($loginname) . "')");
 					$result = $db->query("INSERT INTO `" . TABLE_FTP_QUOTATALLIES . "` (`name`, `quota_type`, `bytes_in_used`, `bytes_out_used`, `bytes_xfer_used`, `files_in_used`, `files_out_used`, `files_xfer_used`) VALUES ('" . $db->escape($loginname) . "', 'user', '0', '0', '0', '0', '0', '0')");
 					$log->logAction(ADM_ACTION, LOG_NOTICE, "automatically added ftp-account for user '" . $loginname . "'");
@@ -848,7 +818,6 @@ if($page == 'customers'
 							"`isemaildomain` = '0', " .
 							"`caneditdomain` = '0', " .
 							"`openbasedir` = '1', " .
-							"`safemode` = '1', " .
 							"`speciallogfile` = '0', " .
 							"`specialsettings` = '', " .
 							"`add_date` = '".date('Y-m-d')."'");
@@ -1199,7 +1168,7 @@ if($page == 'customers'
 							$_stdsubdomain = $result['loginname'] . '.' . $settings['system']['hostname'];
 						}
 
-						$db->query("INSERT INTO `" . TABLE_PANEL_DOMAINS . "` " . "(`domain`, `customerid`, `adminid`, `parentdomainid`, `ipandport`, `documentroot`, `zonefile`, `isemaildomain`, `caneditdomain`, `openbasedir`, `safemode`, `speciallogfile`, `specialsettings`, `add_date`) " . "VALUES ('" . $db->escape($_stdsubdomain) . "', '" . (int)$result['customerid'] . "', '" . (int)$userinfo['adminid'] . "', '-1', '" . $db->escape($settings['system']['defaultip']) . "', '" . $db->escape($result['documentroot']) . "', '', '0', '0', '1', '1', '0', '', '".date('Y-m-d')."')");
+						$db->query("INSERT INTO `" . TABLE_PANEL_DOMAINS . "` " . "(`domain`, `customerid`, `adminid`, `parentdomainid`, `ipandport`, `documentroot`, `zonefile`, `isemaildomain`, `caneditdomain`, `openbasedir`, `speciallogfile`, `specialsettings`, `add_date`) " . "VALUES ('" . $db->escape($_stdsubdomain) . "', '" . (int)$result['customerid'] . "', '" . (int)$userinfo['adminid'] . "', '-1', '" . $db->escape($settings['system']['defaultip']) . "', '" . $db->escape($result['documentroot']) . "', '', '0', '0', '1', '0', '', '".date('Y-m-d')."')");
 						$domainid = $db->insert_id();
 						$db->query('UPDATE `' . TABLE_PANEL_CUSTOMERS . '` SET `standardsubdomain`=\'' . (int)$domainid . '\' WHERE `customerid`=\'' . (int)$result['customerid'] . '\'');
 						$log->logAction(ADM_ACTION, LOG_NOTICE, "automatically added standardsubdomain for user '" . $result['loginname'] . "'");
@@ -1265,8 +1234,8 @@ if($page == 'customers'
 								/* Prevent access, if deactivated */
 								if($deactivated)
 								{
-									$db_root->query('REVOKE ALL PRIVILEGES ON * . * FROM `' . $db_root->escape($row_database['databasename']) . '`@`' . $db_root->escape($mysql_access_host) . '`');
-									$db_root->query('REVOKE ALL PRIVILEGES ON `' . str_replace('_', '\_', $db_root->escape($row_database['databasename'])) . '` . * FROM `' . $db_root->escape($row_database['databasename']) . '`@`' . $db_root->escape($mysql_access_host) . '`');
+									// failsafe if user has been deleted manually (requires MySQL 4.1.2+)
+									$db_root->query('REVOKE ALL PRIVILEGES, GRANT OPTION FROM \'' . $db_root->escape($row_database['databasename']) .'\'',false,true);
 								}
 								else /* Otherwise grant access */
 								{
@@ -1302,11 +1271,8 @@ if($page == 'customers'
 					$db->query("UPDATE `" . TABLE_PANEL_CUSTOMERS . "` SET `name`='" . $db->escape($name) . "', `firstname`='" . $db->escape($firstname) . "', `gender`='" . $db->escape($gender) . "', `company`='" . $db->escape($company) . "', `street`='" . $db->escape($street) . "', `zipcode`='" . $db->escape($zipcode) . "', `city`='" . $db->escape($city) . "', `phone`='" . $db->escape($phone) . "', `fax`='" . $db->escape($fax) . "', `email`='" . $db->escape($email) . "', `customernumber`='" . $db->escape($customernumber) . "', `def_language`='" . $db->escape($def_language) . "', `password` = '" . $password . "', `diskspace`='" . $db->escape($diskspace) . "', `traffic`='" . $db->escape($traffic) . "', `subdomains`='" . $db->escape($subdomains) . "', `emails`='" . $db->escape($emails) . "', `email_accounts` = '" . $db->escape($email_accounts) . "', `email_forwarders`='" . $db->escape($email_forwarders) . "', `ftps`='" . $db->escape($ftps) . "', `tickets`='" . $db->escape($tickets) . "', `mysqls`='" . $db->escape($mysqls) . "', `deactivated`='" . $db->escape($deactivated) . "', `phpenabled`='" . $db->escape($phpenabled) . "', `email_quota`='" . $db->escape($email_quota) . "', `imap`='" . $db->escape($email_imap) . "', `pop3`='" . $db->escape($email_pop3) . "', `aps_packages`='" . (int)$number_of_aps_packages . "', `perlenabled`='" . $db->escape($perlenabled) . "', `email_autoresponder`='" . $db->escape($email_autoresponder) . "', `backup_allowed`='" . $db->escape($backup_allowed) . "' WHERE `customerid`='" . (int)$id . "'");
 					$admin_update_query = "UPDATE `" . TABLE_PANEL_ADMINS . "` SET `customers_used` = `customers_used` ";
 
-					# Using filesystem - quota, insert a task which cleans the filesystem - quota
-					if ($settings['system']['diskquota_enabled'])
-					{
-						inserttask('10');
-					}
+					// Using filesystem - quota, insert a task which cleans the filesystem - quota
+					inserttask('10');
 
 					if($mysqls != '-1'
 					   || $result['mysqls'] != '-1')

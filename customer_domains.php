@@ -197,11 +197,9 @@ elseif($page == 'domains')
 				$result = $db->query("UPDATE `" . TABLE_PANEL_CUSTOMERS . "` SET `subdomains_used`=`subdomains_used`-1 WHERE `customerid`='" . (int)$userinfo['customerid'] . "'");
 				inserttask('1');
 
-				# Using nameserver, insert a task which rebuilds the server config
-				if ($settings['system']['bind_enable'])
-				{
-					inserttask('4');
-				}
+				// Using nameserver, insert a task which rebuilds the server config
+				inserttask('4');
+
 				redirectTo($filename, Array('page' => $page, 's' => $s));
 			}
 			else
@@ -254,8 +252,17 @@ elseif($page == 'domains')
 				if(!preg_match('/^https?\:\/\//', $path)
 				   || !validateUrl($idna_convert->encode($path)))
 				{
-					$path = $userinfo['documentroot'] . '/' . $path;
-					$path = makeCorrectDir($path);
+					// If path is empty or '/' and 'Use domain name as default value for DocumentRoot path' is enabled in settings,
+					// set default path to subdomain or domain name
+					if((($path == '') || ($path == '/'))
+						&& $settings['system']['documentroot_use_default_value'] == 1)
+					{
+						$path = makeCorrectDir($userinfo['documentroot'] . '/' . $completedomain);
+					}
+					else
+					{
+						$path = makeCorrectDir($userinfo['documentroot'] . '/' . $path);
+					}
 					if (strstr($path, ":") !== FALSE)
 					{
 						standard_error('pathmaynotcontaincolon');
@@ -334,8 +341,7 @@ elseif($page == 'domains')
 								`parentdomainid` = '" . (int)$domain_check['id'] . "', 
 								`isemaildomain` = '" . ($domain_check['subcanemaildomain'] == '3' ? '1' : '0') . "', 
 								`openbasedir` = '" . $db->escape($domain_check['openbasedir']) . "', 
-								`openbasedir_path` = '" . $db->escape($openbasedir_path) . "', 
-								`safemode` = '" . $db->escape($domain_check['safemode']) . "', 
+								`openbasedir_path` = '" . $db->escape($openbasedir_path) . "',
 								`speciallogfile` = '" . $db->escape($domain_check['speciallogfile']) . "', 
 								`specialsettings` = '" . $db->escape($domain_check['specialsettings']) . "', 
 								`ssl_redirect` = '" . $ssl_redirect . "', 
@@ -353,10 +359,8 @@ elseif($page == 'domains')
 					inserttask('1');
 
 					// Using nameserver, insert a task which rebuilds the server config
-					if ($settings['system']['bind_enable'])
-					{
-						inserttask('4');
-					}
+					inserttask('4');
+
 					redirectTo($filename, Array('page' => $page, 's' => $s));
 				}
 			}
@@ -388,7 +392,13 @@ elseif($page == 'domains')
 					}
 				}
 
-				//$ssl_redirect = makeyesno('ssl_redirect', '1', '0', $result['ssl_redirect']);
+				// check if we at least have one ssl-ip/port, #1179
+				$ssl_ipsandports = '';
+				$resultX = $db->query_first("SELECT COUNT(*) as countSSL FROM `panel_ipsandports` WHERE `ssl`='1'");
+				if (isset($resultX['countSSL']) && (int)$resultX['countSSL'] > 0) {
+					$ssl_ipsandports = 'notempty';
+				}
+
 				$openbasedir = makeoption($lng['domain']['docroot'], 0, NULL, true) . makeoption($lng['domain']['homedir'], 1, NULL, true);
 				$pathSelect = makePathfield($userinfo['documentroot'], $userinfo['guid'], $userinfo['guid'], $settings['panel']['pathedit']);
 
@@ -431,8 +441,17 @@ elseif($page == 'domains')
 				if(!preg_match('/^https?\:\/\//', $path)
 				   || !validateUrl($idna_convert->encode($path)))
 				{
-					$path = $userinfo['documentroot'] . '/' . $path;
-					$path = makeCorrectDir($path);
+					// If path is empty or '/' and 'Use domain name as default value for DocumentRoot path' is enabled in settings,
+					// set default path to subdomain or domain name
+					if((($path == '') || ($path == '/'))
+						&& $settings['system']['documentroot_use_default_value'] == 1)
+					{
+						$path = makeCorrectDir($userinfo['documentroot'] . '/' . $result['domain']);
+					}
+					else
+					{
+						$path = makeCorrectDir($userinfo['documentroot'] . '/' . $path);
+					}
 					if (strstr($path, ":") !== FALSE)
 					{
 						standard_error('pathmaynotcontaincolon');
@@ -533,10 +552,8 @@ elseif($page == 'domains')
 						inserttask('1');
 
 						// Using nameserver, insert a task which rebuilds the server config
-						if ($settings['system']['bind_enable'])
-						{
-							inserttask('4');
-						}
+						inserttask('4');
+
 					}
 
 					redirectTo($filename, Array('page' => $page, 's' => $s));
@@ -585,11 +602,13 @@ elseif($page == 'domains')
 					}
 				}
 
-				/*
-				$ssl_redirect = makeyesno('ssl_redirect', '1', '0', $result['ssl_redirect']);
-				$iswildcarddomain = makeyesno('iswildcarddomain', '1', '0', $result['iswildcarddomain']);
-				$isemaildomain = makeyesno('isemaildomain', '1', '0', $result['isemaildomain']);
-				*/
+				// check if we at least have one ssl-ip/port, #1179
+				$ssl_ipsandports = '';
+				$resultX = $db->query_first("SELECT COUNT(*) as countSSL FROM `panel_ipsandports` WHERE `ssl`='1'");
+				if (isset($resultX['countSSL']) && (int)$resultX['countSSL'] > 0) {
+					$ssl_ipsandports = 'notempty';
+				}
+
 				$openbasedir = makeoption($lng['domain']['docroot'], 0, $result['openbasedir_path'], true) . makeoption($lng['domain']['homedir'], 1, $result['openbasedir_path'], true);
 
 				$result_ipandport = $db->query_first("SELECT `ip` FROM `".TABLE_PANEL_IPSANDPORTS."` WHERE `id`='".(int)$result['ipandport']."'");
